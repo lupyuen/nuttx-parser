@@ -1,3 +1,5 @@
+-- Based on https://github.com/purescript-contrib/purescript-string-parsers/blob/main/test/Examples.purs
+
 module Main where
 
 import Prelude hiding (between)
