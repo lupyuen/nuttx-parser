@@ -2,6 +2,8 @@
 
 TODO
 
+Test in HTML: [test.html](test.html)
+
 ```bash
 $ node .spago/run.js
 
