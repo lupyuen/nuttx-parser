@@ -38,8 +38,8 @@ printResults = do
   --   \### Example Content 2 ###"
   -- doBoth "parseCSV" parseCSV exampleContent2
 
--- Result was: { addr: "0xc02027e0:", stackDump: "stack_dump:", timestamp: "6.242000", v1: "c0202010", v2: "00000000", v3: "00000001", v4: "00000000" }
-parseStackDump ∷ Parser { timestamp ∷ String, stackDump :: String, addr :: String, v1 :: String, v2 :: String, v3 :: String, v4 :: String }
+-- Result was: { addr: "0xc02027e0:", stackDump: "stack_dump:", timestamp: "6.242000", v1: "c0202010", v2: "00000000", v3: "00000001", v4: "00000000", v5: "00000000", v6: "00000000", v7: "8000ad8a", v8: "00000000" }
+parseStackDump ∷ Parser { addr ∷ String , stackDump ∷ String , timestamp ∷ String , v1 ∷ String , v2 ∷ String , v3 ∷ String , v4 ∷ String , v5 ∷ String , v6 ∷ String , v7 ∷ String , v8 ∷ String }
 parseStackDump = do
   let
     -- commaThenSpaces = string "," *> skipSpaces
@@ -54,6 +54,10 @@ parseStackDump = do
   v2 <- regex "[^ ]+" <* skipSpaces
   v3 <- regex "[^ ]+" <* skipSpaces
   v4 <- regex "[^ ]+" <* skipSpaces
+  v5 <- regex "[^ ]+" <* skipSpaces
+  v6 <- regex "[^ ]+" <* skipSpaces
+  v7 <- regex "[^ ]+" <* skipSpaces
+  v8 <- regex "[^ ]+" <* skipSpaces
 
   -- idNumber <- csvColumn <* commaThenSpaces
   -- firstName <- csvColumn <* commaThenSpaces
@@ -92,6 +96,10 @@ parseStackDump = do
     , v2
     , v3
     , v4
+    , v5
+    , v6
+    , v7
+    , v8
     }
 
 -- Example Content 1
