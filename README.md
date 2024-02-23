@@ -6,7 +6,7 @@ What if we could parse the NuttX Logs in Real-Time? And show the results in the 
 
 Like for Stack Traces, ELF Loader, Memory Manager Logs (malloc / free)?
 
-Let's try it with PureScript, since Functional Languages are better for Parsing Text. And we'll support Online Scripting of PureScript, similar to [try.purescript.org](https://try.purescript.org/)
+Let's try it with PureScript, since Functional Languages are better for Parsing Text. And we'll support Online Scripting of our PureScript for Log Parsing, similar to [try.purescript.org](https://try.purescript.org/)
 
 # Compile PureScript to JavaScript in Web Browser
 
@@ -198,6 +198,25 @@ Output:
   "originalEmail": "my.name.is.mark@mark.mark.com",
   "modifiedEmail": "mynameismark@mark.mark.com"
 }
+```
+
+# Run parseCSV in try.purescript.org
+
+To run parseCSV at [try.purescript.org](https://try.purescript.org/), change 
+
+```purescript
+main :: Effect Unit
+main = printResults
+```
+
+To this...
+
+```purescript
+import TryPureScript (render, withConsole)
+
+main :: Effect Unit
+main = render =<< withConsole do
+  printResults
 ```
 
 TODO
