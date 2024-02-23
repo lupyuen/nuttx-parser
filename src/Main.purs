@@ -16,12 +16,76 @@ import StringParser (Parser, anyChar, between, char, endBy1, eof, fail, lookAhea
 main :: Effect Unit
 main = printResults
 
+-- Parse the NuttX Stack Dump
 printResults :: Effect Unit
 printResults = do
-  log "" -- empty blank line to separate output from function call
+  doRunParser "parseStackDump" parseStackDump
+    "[    6.242000] stack_dump: 0xc02027e0: c0202010 00000000 00000001 00000000 00000000 00000000 8000ad8a 00000000"
 
-  -- Parse the NuttX Stack Dump
-  doRunParser "parseStackDump" parseStackDump "[    6.242000] stack_dump: 0xc02027e0: c0202010 00000000 00000001 00000000 00000000 00000000 8000ad8a 00000000"
+-- Parse a line of NuttX Stack Dump
+-- Result: { addr: "0xc02027e0:", timestamp: "6.242000", v1: "c0202010", v2: "00000000", v3: "00000001", v4: "00000000", v5: "00000000", v6: "00000000", v7: "8000ad8a", v8: "00000000" }
+-- The next line declares the Type. We can actually erase it, VS Code PureScript Extension will helpfully suggest it for us.
+parseStackDump ∷ Parser { addr ∷ String , timestamp ∷ String , v1 ∷ String , v2 ∷ String , v3 ∷ String , v4 ∷ String , v5 ∷ String , v6 ∷ String , v7 ∷ String , v8 ∷ String }
+parseStackDump = do
+
+  -- To parse the line: `[    6.242000] stack_dump: 0xc02027e0: c0202010 00000000 00000001 00000000 00000000 00000000 8000ad8a 00000000`
+  -- Skip `[    `
+  -- `void` means ignore the Text Captured
+  -- `$ something something` is shortcut for `( something something )`
+  -- `<*` is the Delimiter between Patterns
+  void $
+    string "["    -- Match the string `[`
+    <* skipSpaces -- Skip the following spaces
+
+  -- `timestamp` becomes `6.242000`
+  -- `<*` says when we should stop the Text Capture
+  timestamp <-
+    regex "[.0-9]+" 
+    <* string "]" 
+    <* skipSpaces
+
+  -- Skip `stack_dump: `
+  -- `void` means ignore the Text Captured
+  -- `$ something something` is shortcut for `( something something )`
+  -- `<*` is the Delimiter between Patterns
+  void $ string "stack_dump:" <* skipSpaces
+
+  -- `addr` becomes `0xc02027e0:`
+  addr <- regex "[^ ]+" <* skipSpaces
+
+  -- `v1` becomes `c0202010`
+  -- `v2` becomes `00000000` and so on
+  v1 <- regex "[^ ]+" <* skipSpaces
+  v2 <- regex "[^ ]+" <* skipSpaces
+  v3 <- regex "[^ ]+" <* skipSpaces
+  v4 <- regex "[^ ]+" <* skipSpaces
+  v5 <- regex "[^ ]+" <* skipSpaces
+  v6 <- regex "[^ ]+" <* skipSpaces
+  v7 <- regex "[^ ]+" <* skipSpaces
+  v8 <- regex "[^ ]+" <* skipSpaces
+
+  -- Return the parsed content
+  -- `pure` because we're in a `do` block that allows Effects
+  pure
+    { timestamp
+    , addr
+    , v1
+    , v2
+    , v3
+    , v4
+    , v5
+    , v6
+    , v7
+    , v8
+    }
+
+-- Previously:
+-- printResults :: Effect Unit
+-- printResults = do
+--   log "" -- empty blank line to separate output from function call
+
+--   -- Parse the NuttX Stack Dump
+--   doRunParser "parseStackDump" parseStackDump "[    6.242000] stack_dump: 0xc02027e0: c0202010 00000000 00000001 00000000 00000000 00000000 8000ad8a 00000000"
 
   -- log "### Example Content 1 ###"
   -- doBoth "fail" ((fail "example failure message") :: Parser Unit) exampleContent1
@@ -37,70 +101,6 @@ printResults = do
   --   "\n\
   --   \### Example Content 2 ###"
   -- doBoth "parseCSV" parseCSV exampleContent2
-
--- Result was: { addr: "0xc02027e0:", stackDump: "stack_dump:", timestamp: "6.242000", v1: "c0202010", v2: "00000000", v3: "00000001", v4: "00000000", v5: "00000000", v6: "00000000", v7: "8000ad8a", v8: "00000000" }
-parseStackDump ∷ Parser { addr ∷ String , stackDump ∷ String , timestamp ∷ String , v1 ∷ String , v2 ∷ String , v3 ∷ String , v4 ∷ String , v5 ∷ String , v6 ∷ String , v7 ∷ String , v8 ∷ String }
-parseStackDump = do
-  let
-    -- commaThenSpaces = string "," *> skipSpaces
-    -- csvColumn = regex "[^,]+"
-    timestampPattern = regex "[ .0-9]+"
-
-  void $ string "[" <* skipSpaces
-  timestamp <- timestampPattern <* string "]" <* skipSpaces
-  stackDump <- regex "[^ ]+" <* skipSpaces
-  addr <- regex "[^ ]+" <* skipSpaces
-  v1 <- regex "[^ ]+" <* skipSpaces
-  v2 <- regex "[^ ]+" <* skipSpaces
-  v3 <- regex "[^ ]+" <* skipSpaces
-  v4 <- regex "[^ ]+" <* skipSpaces
-  v5 <- regex "[^ ]+" <* skipSpaces
-  v6 <- regex "[^ ]+" <* skipSpaces
-  v7 <- regex "[^ ]+" <* skipSpaces
-  v8 <- regex "[^ ]+" <* skipSpaces
-
-  -- idNumber <- csvColumn <* commaThenSpaces
-  -- firstName <- csvColumn <* commaThenSpaces
-  -- lastName <- csvColumn <* commaThenSpaces
-  -- age <- csvColumn <* commaThenSpaces
-
-  -- lookAhead will parse the content ahead of us,
-  -- then reset the position of the string
-  -- to what it was before it.
-  -- originalEmail <- lookAhead $ regex "[^\n]+"
-
-  -- let
-  --   parseAlphanumericChars = regex "[a-zA-Z0-9]+"
-  --   parsePeriodsAndPlusesAsEmptyStrings =
-  --     "" <$ ((string ".") <|> (string "+"))
-  --   parseListOfParts =
-  --     many1
-  --       ( parseAlphanumericChars
-  --           <|> parsePeriodsAndPlusesAsEmptyStrings
-  --       )
-
-  -- usernameWithoutPeriodsOrPluses <- fold <$> parseListOfParts
-  -- void $ string "@"
-  -- domainName <- fold <$> (many1 ((regex "[a-zA-Z0-9]+") <|> (string ".")))
-  -- void $ string "\n"
-
-  -- -- Ensure we hit the end of the string content via 'end-of-file'
-  -- void eof
-
-  -- now return the parsed content
-  pure
-    { timestamp
-    , stackDump
-    , addr
-    , v1
-    , v2
-    , v3
-    , v4
-    , v5
-    , v6
-    , v7
-    , v8
-    }
 
 -- Example Content 1
 
@@ -307,7 +307,7 @@ doUnParser parserName parser content = do
         "\n\
         \Error: "
       <> show rec.error
-    Right rec -> log $ "Result was: " <> show rec.result
+    Right rec -> log $ "Result: " <> show rec.result
       <>
         "\n\
         \Suffix was: "
@@ -322,5 +322,5 @@ doRunParser parserName parser content = do
   log $ "(runParser) Parsing content with '" <> parserName <> "'"
   case runParser parser content of
     Left error -> logShow error
-    Right result -> log $ "Result was: " <> show result
+    Right result -> log $ "Result: " <> show result
   log "-----"
