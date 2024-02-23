@@ -1,6 +1,12 @@
 # Parsing Apache NuttX RTOS Logs with PureScript
 
-TODO
+In the Web Browser, we can get Real-Time Logs from NuttX Devices (Web Serial API) NuttX Emulator (Term.js)...
+
+What if we could parse the NuttX Logs in Real-Time? And show the results in the Web Browser?
+
+Like for Stack Traces, ELF Loader, Memory Manager Logs (malloc / free)?
+
+Let's try it with PureScript, since Functional Languages are better for Parsing Text...
 
 # Compile PureScript to JavaScript in Web Browser
 
@@ -160,3 +166,38 @@ Result was: { age: "24", firstName: "Mark", idNumber: "523", lastName: "Kenderso
 Suffix was: { position: 110, substring: "" }
 -----
 ```
+
+# Run parseCSV in Web Browser
+
+Here's how we run parseCSV in the Web Browser: [test.html](test.html)
+
+```javascript
+  // Import Main Module
+  import { main, doBoth, doRunParser, parseCSV, exampleContent2 } from './output/Main/index.js';
+
+  // Run Main Function
+  main();
+
+  // Run parseCSV
+  doRunParser({show : console.log})
+    ("bbbb")
+    (parseCSV)
+    (exampleContent2)
+    ();
+```
+
+Output:
+
+```text
+(runParser) Parsing content with 'bbbb'
+{
+  "idNumber": "523",
+  "firstName": "Mark",
+  "lastName": "Kenderson",
+  "age": "24",
+  "originalEmail": "my.name.is.mark@mark.mark.com",
+  "modifiedEmail": "mynameismark@mark.mark.com"
+}
+```
+
+TODO
