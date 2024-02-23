@@ -2,11 +2,13 @@
 
 In the Web Browser, we can get Real-Time Logs from NuttX Devices (Web Serial API) NuttX Emulator (Term.js)...
 
-What if we could parse the NuttX Logs in Real-Time? And show the results in the Web Browser?
+What if we could Analyse the NuttX Logs in Real-Time? And show the results in the Web Browser?
 
-Like for Stack Traces, ELF Loader, Memory Manager Logs (malloc / free)?
+Like for [Stack Traces](https://gist.github.com/lupyuen/a715e4e77c011d610d0b418e97f8bf5d#file-nuttx-tcc-app-log-L168-L224), [ELF Loader Log](https://gist.github.com/lupyuen/a715e4e77c011d610d0b418e97f8bf5d#file-nuttx-tcc-app-log-L1-L167), [Memory Manager Log](https://docs.google.com/spreadsheets/d/1g0-O2qdgjwNfSIxfayNzpUN8mmMyWFmRf2dMyQ9a8JI/edit#gid=0) (malloc / free)?
 
-Let's try it with PureScript, since Functional Languages are better for Parsing Text. And we'll support Online Scripting of our PureScript for Log Parsing, similar to [try.purescript.org](https://try.purescript.org/)
+Let's do it with PureScript, since Functional Languages are better for Parsing Text.
+
+And we'll support Online Scripting of our PureScript for Log Parsing, similar to [try.purescript.org](https://try.purescript.org/)
 
 # Compile PureScript to JavaScript in Web Browser
 
@@ -199,6 +201,35 @@ Output:
   "modifiedEmail": "mynameismark@mark.mark.com"
 }
 ```
+
+We expose the PureScript Functions in the Web Browser: [test.html](test.html)
+
+```javascript
+// Import Main Module
+import { main, doBoth, doRunParser, parseCSV, exampleContent2 } from './output/Main/index.js';
+
+// For Testing: Export the PureScript Functions
+window.main = main;
+window.doBoth = doBoth;
+window.doRunParser = doRunParser;
+window.parseCSV = parseCSV;
+window.exampleContent2 = exampleContent2;
+```
+
+So we can run experiments in the JavaScript Console...
+
+```javascript
+// Run parseCSV in JavaScript Console
+window.doRunParser({show : console.log})
+  ("bbbb")
+  (window.parseCSV)
+  (window.exampleContent2)
+  ();
+```
+
+TODO: Change `exampleContent2` to our [NuttX Log](https://gist.github.com/lupyuen/a715e4e77c011d610d0b418e97f8bf5d)
+
+TODO: Change `{show : console.log}` to record the Parser Output from parsing our NuttX Logs
 
 # Run parseCSV in try.purescript.org
 
