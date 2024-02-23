@@ -38,7 +38,7 @@ printResults = do
   --   \### Example Content 2 ###"
   -- doBoth "parseCSV" parseCSV exampleContent2
 
--- parseStackDump :: Parser CsvContent
+parseStackDump ∷ Parser { idNumber ∷ String }
 parseStackDump = do
   let
     commaThenSpaces = string "," *> skipSpaces
