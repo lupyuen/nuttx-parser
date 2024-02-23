@@ -234,7 +234,7 @@ window.StringParser_Parser
 
 # Run parseCSV in try.purescript.org
 
-To run parseCSV at [try.purescript.org](https://try.purescript.org/), change 
+To run parseCSV at [try.purescript.org](https://try.purescript.org/), change...
 
 ```purescript
 main :: Effect Unit
