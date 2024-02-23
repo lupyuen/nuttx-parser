@@ -200,15 +200,94 @@ Let's parse the [NuttX Stack Dump](https://gist.github.com/lupyuen/a715e4e77c011
 [    6.242000] stack_dump: 0xc0202800: 00000000 00000000 0007e7f0 00000000 c0200208 00000000 c02001e8 00000000
 ```
 
-TODO: Spot interesting addresses like 8000ad8a, c0202010
-
-Let's try this...
+Let's try this single line...
 
 ```text
 [    6.242000] stack_dump: 0xc02027e0: c0202010 00000000 00000001 00000000 00000000 00000000 8000ad8a 00000000
 ```
 
+Here's our parser in PureScript: [src/Main.purs](src/Main.purs)
 
+```purescript
+-- Parse the NuttX Stack Dump
+printResults :: Effect Unit
+printResults = do
+  doRunParser "parseStackDump" parseStackDump
+    "[    6.242000] stack_dump: 0xc02027e0: c0202010 00000000 00000001 00000000 00000000 00000000 8000ad8a 00000000"
+
+-- Parse a line of NuttX Stack Dump
+-- Result: { addr: "0xc02027e0:", timestamp: "6.242000", v1: "c0202010", v2: "00000000", v3: "00000001", v4: "00000000", v5: "00000000", v6: "00000000", v7: "8000ad8a", v8: "00000000" }
+-- The next line declares the Type. We can actually erase it, VS Code PureScript Extension will helpfully suggest it for us.
+parseStackDump ∷ Parser { addr ∷ String , timestamp ∷ String , v1 ∷ String , v2 ∷ String , v3 ∷ String , v4 ∷ String , v5 ∷ String , v6 ∷ String , v7 ∷ String , v8 ∷ String }
+parseStackDump = do
+
+  -- To parse the line: `[    6.242000] stack_dump: 0xc02027e0: c0202010 00000000 00000001 00000000 00000000 00000000 8000ad8a 00000000`
+  -- Skip `[    `
+  -- `void` means ignore the Text Captured
+  -- `$ something something` is shortcut for `( something something )`
+  -- `<*` is the Delimiter between Patterns
+  void $
+    string "["    -- Match the string `[`
+    <* skipSpaces -- Skip the following spaces
+
+  -- `timestamp` becomes `6.242000`
+  -- `<*` says when we should stop the Text Capture
+  timestamp <-
+    regex "[.0-9]+" 
+    <* string "]" 
+    <* skipSpaces
+
+  -- Skip `stack_dump: `
+  -- `void` means ignore the Text Captured
+  -- `$ something something` is shortcut for `( something something )`
+  -- `<*` is the Delimiter between Patterns
+  void $ string "stack_dump:" <* skipSpaces
+
+  -- `addr` becomes `0xc02027e0:`
+  addr <- regex "[^ ]+" <* skipSpaces
+
+  -- `v1` becomes `c0202010`
+  -- `v2` becomes `00000000` and so on
+  v1 <- regex "[^ ]+" <* skipSpaces
+  v2 <- regex "[^ ]+" <* skipSpaces
+  v3 <- regex "[^ ]+" <* skipSpaces
+  v4 <- regex "[^ ]+" <* skipSpaces
+  v5 <- regex "[^ ]+" <* skipSpaces
+  v6 <- regex "[^ ]+" <* skipSpaces
+  v7 <- regex "[^ ]+" <* skipSpaces
+  v8 <- regex "[^ ]+" <* skipSpaces
+
+  -- Return the parsed content
+  -- `pure` because we're in a `do` block that allows Effects
+  pure
+    { timestamp
+    , addr
+    , v1
+    , v2
+    , v3
+    , v4
+    , v5
+    , v6
+    , v7
+    , v8
+    }
+```
+
+Result of parsing...
+
+```text
+$ spago run
+[info] Build succeeded.
+(runParser) Parsing content with 'parseStackDump'
+Result: {
+  addr: "0xc02027e0:", timestamp: "6.242000",
+  v1: "c0202010", v2: "00000000", v3: "00000001", v4: "00000000",
+  v5: "00000000", v6: "00000000", v7: "8000ad8a", v8: "00000000" }
+```
+
+Not that hard!
+
+TODO: Spot interesting addresses like 8000ad8a, c0202010
 
 # Compile PureScript to JavaScript in Web Browser
 
