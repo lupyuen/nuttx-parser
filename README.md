@@ -176,37 +176,42 @@ Here's how we run [parseCSV](src/Main.purs) in the Web Browser: [test.html](test
 ```javascript
   // Import Main Module
   import { main, doBoth, doRunParser, parseCSV, exampleContent2 } from './output/Main/index.js';
-
-  // Run Main Function
-  main();
+  import * as StringParser_Parser from "./output/StringParser.Parser/index.js";
 
   // Run parseCSV
-  doRunParser({show : console.log})
-    ("bbbb")
+  const result = StringParser_Parser
+    .runParser
     (parseCSV)
     (exampleContent2)
-    ();
+    ;
+  console.log({result});
 ```
 
 Output:
 
-```text
-(runParser) Parsing content with 'bbbb'
+```json
 {
-  "idNumber": "523",
-  "firstName": "Mark",
-  "lastName": "Kenderson",
-  "age": "24",
-  "originalEmail": "my.name.is.mark@mark.mark.com",
-  "modifiedEmail": "mynameismark@mark.mark.com"
+    "result": {
+        "value0": {
+            "idNumber": "523",
+            "firstName": "Mark",
+            "lastName": "Kenderson",
+            "age": "24",
+            "originalEmail": "my.name.is.mark@mark.mark.com",
+            "modifiedEmail": "mynameismark@mark.mark.com"
+        }
+    }
 }
 ```
+
+TODO: Change `exampleContent2` to parse our [NuttX Log](https://gist.github.com/lupyuen/a715e4e77c011d610d0b418e97f8bf5d)
 
 We expose the PureScript Functions in the Web Browser: [test.html](test.html)
 
 ```javascript
 // Import Main Module
 import { main, doBoth, doRunParser, parseCSV, exampleContent2 } from './output/Main/index.js';
+import * as StringParser_Parser from "./output/StringParser.Parser/index.js";
 
 // For Testing: Export the PureScript Functions
 window.main = main;
@@ -214,22 +219,18 @@ window.doBoth = doBoth;
 window.doRunParser = doRunParser;
 window.parseCSV = parseCSV;
 window.exampleContent2 = exampleContent2;
+window.StringParser_Parser = StringParser_Parser;
 ```
 
 So we can run experiments in the JavaScript Console...
 
 ```javascript
 // Run parseCSV in JavaScript Console
-window.doRunParser({show : console.log})
-  ("bbbb")
+window.StringParser_Parser
+  .runParser
   (window.parseCSV)
   (window.exampleContent2)
-  ();
 ```
-
-TODO: Change `exampleContent2` to our [NuttX Log](https://gist.github.com/lupyuen/a715e4e77c011d610d0b418e97f8bf5d)
-
-TODO: Change `{show : console.log}` to record the Parser Output from parsing our NuttX Logs
 
 # Run parseCSV in try.purescript.org
 

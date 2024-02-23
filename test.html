@@ -4,6 +4,7 @@
 <script type=module>
   // Import Main Module
   import { main, doBoth, doRunParser, parseCSV, exampleContent2 } from './output/Main/index.js';
+  import * as StringParser_Parser from "./output/StringParser.Parser/index.js";
 
   // For Testing: Export the PureScript Functions
   window.main = main;
@@ -11,18 +12,28 @@
   window.doRunParser = doRunParser;
   window.parseCSV = parseCSV;
   window.exampleContent2 = exampleContent2;
+  window.StringParser_Parser = StringParser_Parser;
 
   // Run Main Function
+  console.log('Running main...');
   main();
 
   // Run parseCSV
-  const result = 
-    doRunParser({show : console.log})
+  console.log('Running StringParser_Parser...');
+  const result = StringParser_Parser
+    .runParser
+    (parseCSV)
+    (exampleContent2)
+    ;
+  console.log({result});
+  window.result = result;
+
+  // Alternatively
+  console.log('Running doRunParser...');
+  doRunParser({show : console.log})
     ("bbbb")
     (parseCSV)
     (exampleContent2)
     ();
-  window.result = result;
-  console.log({result});
 </script>
 </html>
