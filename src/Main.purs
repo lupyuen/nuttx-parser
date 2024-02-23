@@ -45,8 +45,8 @@ parseStackDump = do
     -- csvColumn = regex "[^,]+"
     timestampPattern = regex ".*"
 
-  -- now we're on line 2
   timestamp <- timestampPattern
+
   -- idNumber <- csvColumn <* commaThenSpaces
   -- firstName <- csvColumn <* commaThenSpaces
   -- lastName <- csvColumn <* commaThenSpaces
