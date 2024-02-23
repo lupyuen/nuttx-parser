@@ -3,12 +3,26 @@
 </body>
 <script type=module>
   // Import Main Module
-  import { main, doBoth, parseCSV, exampleContent2 } from './output/Main/index.js';
+  import { main, doBoth, doRunParser, parseCSV, exampleContent2 } from './output/Main/index.js';
+
+  // For Testing: Export the PureScript Functions
+  window.main = main;
+  window.doBoth = doBoth;
+  window.doRunParser = doRunParser;
+  window.parseCSV = parseCSV;
+  window.exampleContent2 = exampleContent2;
 
   // Run Main Function
   main();
 
   // Run parseCSV
-  // TODO: console.log({parseCSV: parseCSV(exampleContent2)});
+  const result = 
+    doRunParser({show : console.log})
+    ("bbbb")
+    (parseCSV)
+    (exampleContent2)
+    ();
+  window.result = result;
+  console.log({result});
 </script>
 </html>
