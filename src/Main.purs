@@ -20,20 +20,69 @@ printResults :: Effect Unit
 printResults = do
   log "" -- empty blank line to separate output from function call
 
-  log "### Example Content 1 ###"
-  doBoth "fail" ((fail "example failure message") :: Parser Unit) exampleContent1
-  doBoth "numberOfAs" numberOfAs exampleContent1
-  doBoth "removePunctuation" removePunctuation exampleContent1
-  doBoth "replaceVowelsWithUnderscore" replaceVowelsWithUnderscore exampleContent1
-  doBoth "tokenizeContentBySpaceChars" tokenizeContentBySpaceChars exampleContent1
-  doBoth "extractWords" extractWords exampleContent1
-  doBoth "badExtractWords" badExtractWords exampleContent1
-  doBoth "quotedLetterExists" quotedLetterExists exampleContent1
+  -- Parse the NuttX Stack Dump
+  doRunParser "parseStackDump" parseStackDump "[    6.242000] stack_dump: 0xc02027e0: c0202010 00000000 00000001 00000000 00000000 00000000 8000ad8a 00000000"
 
-  log
-    "\n\
-    \### Example Content 2 ###"
-  doBoth "parseCSV" parseCSV exampleContent2
+  -- log "### Example Content 1 ###"
+  -- doBoth "fail" ((fail "example failure message") :: Parser Unit) exampleContent1
+  -- doBoth "numberOfAs" numberOfAs exampleContent1
+  -- doBoth "removePunctuation" removePunctuation exampleContent1
+  -- doBoth "replaceVowelsWithUnderscore" replaceVowelsWithUnderscore exampleContent1
+  -- doBoth "tokenizeContentBySpaceChars" tokenizeContentBySpaceChars exampleContent1
+  -- doBoth "extractWords" extractWords exampleContent1
+  -- doBoth "badExtractWords" badExtractWords exampleContent1
+  -- doBoth "quotedLetterExists" quotedLetterExists exampleContent1
+
+  -- log
+  --   "\n\
+  --   \### Example Content 2 ###"
+  -- doBoth "parseCSV" parseCSV exampleContent2
+
+-- parseStackDump :: Parser CsvContent
+parseStackDump = do
+  let
+    commaThenSpaces = string "," *> skipSpaces
+    csvColumn = regex "[^,]+"
+
+  -- now we're on line 2
+  idNumber <- csvColumn
+  -- idNumber <- csvColumn <* commaThenSpaces
+  -- firstName <- csvColumn <* commaThenSpaces
+  -- lastName <- csvColumn <* commaThenSpaces
+  -- age <- csvColumn <* commaThenSpaces
+
+  -- lookAhead will parse the content ahead of us,
+  -- then reset the position of the string
+  -- to what it was before it.
+  -- originalEmail <- lookAhead $ regex "[^\n]+"
+
+  -- let
+  --   parseAlphanumericChars = regex "[a-zA-Z0-9]+"
+  --   parsePeriodsAndPlusesAsEmptyStrings =
+  --     "" <$ ((string ".") <|> (string "+"))
+  --   parseListOfParts =
+  --     many1
+  --       ( parseAlphanumericChars
+  --           <|> parsePeriodsAndPlusesAsEmptyStrings
+  --       )
+
+  -- usernameWithoutPeriodsOrPluses <- fold <$> parseListOfParts
+  -- void $ string "@"
+  -- domainName <- fold <$> (many1 ((regex "[a-zA-Z0-9]+") <|> (string ".")))
+  -- void $ string "\n"
+
+  -- -- Ensure we hit the end of the string content via 'end-of-file'
+  -- void eof
+
+  -- now return the parsed content
+  pure
+    { idNumber
+    -- , firstName
+    -- , lastName
+    -- , age
+    -- , originalEmail
+    -- , modifiedEmail: usernameWithoutPeriodsOrPluses <> "@" <> domainName
+    }
 
 -- Example Content 1
 

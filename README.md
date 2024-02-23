@@ -202,6 +202,14 @@ Let's parse the [NuttX Stack Dump](https://gist.github.com/lupyuen/a715e4e77c011
 
 TODO: Spot interesting addresses like 8000ad8a, c0202010
 
+Let's try this...
+
+```text
+[    6.242000] stack_dump: 0xc02027e0: c0202010 00000000 00000001 00000000 00000000 00000000 8000ad8a 00000000
+```
+
+
+
 # Compile PureScript to JavaScript in Web Browser
 
 Here's how we compile PureScript to JavaScript inside our Web Browser...
