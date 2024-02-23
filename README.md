@@ -6,7 +6,7 @@ What if we could parse the NuttX Logs in Real-Time? And show the results in the 
 
 Like for Stack Traces, ELF Loader, Memory Manager Logs (malloc / free)?
 
-Let's try it with PureScript, since Functional Languages are better for Parsing Text...
+Let's try it with PureScript, since Functional Languages are better for Parsing Text. And we'll support Online Scripting of PureScript, similar to [try.purescript.org](https://try.purescript.org/)
 
 # Compile PureScript to JavaScript in Web Browser
 
@@ -92,9 +92,9 @@ The JSON Response looks like this...
 }
 ```
 
-# TODO
+# Run parseCSV in Node.js
 
-Test in HTML: [test.html](test.html)
+Based on parseCSV in [src/Main.purs](src/Main.purs), this is how we run it in Node.js...
 
 ```bash
 $ node .spago/run.js
@@ -169,7 +169,7 @@ Suffix was: { position: 110, substring: "" }
 
 # Run parseCSV in Web Browser
 
-Here's how we run parseCSV in the Web Browser: [test.html](test.html)
+Here's how we run [parseCSV](src/Main.purs) in the Web Browser: [test.html](test.html)
 
 ```javascript
   // Import Main Module
