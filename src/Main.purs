@@ -38,18 +38,22 @@ printResults = do
   --   \### Example Content 2 ###"
   -- doBoth "parseCSV" parseCSV exampleContent2
 
-parseStackDump ∷ Parser { timestamp ∷ String, stackDump :: String, addr :: String }
+-- Result was: { addr: "0xc02027e0:", stackDump: "stack_dump:", timestamp: "6.242000", v1: "c0202010", v2: "00000000", v3: "00000001", v4: "00000000" }
+parseStackDump ∷ Parser { timestamp ∷ String, stackDump :: String, addr :: String, v1 :: String, v2 :: String, v3 :: String, v4 :: String }
 parseStackDump = do
   let
     -- commaThenSpaces = string "," *> skipSpaces
     -- csvColumn = regex "[^,]+"
     timestampPattern = regex "[ .0-9]+"
 
-  -- Result was: { addr: "0xc02027e0:", stackDump: "stack_dump:", timestamp: "6.242000" }
   void $ string "[" <* skipSpaces
   timestamp <- timestampPattern <* string "]" <* skipSpaces
   stackDump <- regex "[^ ]+" <* skipSpaces
   addr <- regex "[^ ]+" <* skipSpaces
+  v1 <- regex "[^ ]+" <* skipSpaces
+  v2 <- regex "[^ ]+" <* skipSpaces
+  v3 <- regex "[^ ]+" <* skipSpaces
+  v4 <- regex "[^ ]+" <* skipSpaces
 
   -- idNumber <- csvColumn <* commaThenSpaces
   -- firstName <- csvColumn <* commaThenSpaces
@@ -84,6 +88,10 @@ parseStackDump = do
     { timestamp
     , stackDump
     , addr
+    , v1
+    , v2
+    , v3
+    , v4
     }
 
 -- Example Content 1
