@@ -43,8 +43,9 @@ parseStackDump = do
   let
     -- commaThenSpaces = string "," *> skipSpaces
     -- csvColumn = regex "[^,]+"
-    timestampPattern = regex ".*"
+    timestampPattern = string "[" *> regex "[ .0-9]+"
 
+  -- timestamp: "    6.242000"
   timestamp <- timestampPattern
 
   -- idNumber <- csvColumn <* commaThenSpaces
