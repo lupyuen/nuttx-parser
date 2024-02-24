@@ -426,4 +426,17 @@ The JSON Response looks like this...
 }
 ```
 
+# Parse NuttX Exception with PureScript
+
+Let's parse the [NuttX Exception](https://gist.github.com/lupyuen/a715e4e77c011d610d0b418e97f8bf5d#file-nuttx-tcc-app-log-L168-L224)...
+
+```text
+[    6.242000] riscv_exception: EXCEPTION: Instruction page fault. MCAUSE: 000000000000000c, EPC: 000000008000ad8a, MTVAL: 000000008000ad8a
+[    6.242000] riscv_exception: PANIC!!! Exception = 000000000000000c
+[    6.242000] _assert: Current Version: NuttX  12.4.0 f8b0b06b978 Jan 29 2024 01:16:20 risc-v
+[    6.242000] _assert: Assertion failed panic: at file: common/riscv_exception.c:85 task: /system/bin/init process: /system/bin/init 0xc000001a
+```
+
+And explain in friendly words what this means.
+
 TODO
