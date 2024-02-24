@@ -10,6 +10,12 @@ Let's do it with PureScript, since Functional Languages are better for Parsing T
 
 And we'll support Online Scripting of our PureScript for Log Parsing, similar to [try.purescript.org](https://try.purescript.org/)
 
+_Why not code all this in JavaScript instead of PureScript?_
+
+(1) NuttX Logs might appear differently over time. Good to have a quick way to patch our parser as the NuttX Logs change.
+
+(2) We need to implement High-Level Rules that will interpret the NuttX Logs. We might adjust the Rules over time.
+
 # Run parseCSV in Node.js
 
 Let's run parseCSV in [src/Main.purs](src/Main.purs). Normally we run PureScript like this...
