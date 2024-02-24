@@ -289,6 +289,57 @@ Result: {
 
 Not that hard! We could have refactored the code to make it shorter. But we'll keep it long because it's easier to read.
 
+Works OK in JavaScript too: [test.html](test.html)
+
+```javascript
+// Run parseStackDump
+const stackDump = `[    6.242000] stack_dump: 0xc02027e0: c0202010 00000000 00000001 00000000 00000000 00000000 8000ad8a 00000000`;
+const result = StringParser_Parser
+  .runParser
+  (parseStackDump)
+  (stackDump)
+  ;
+console.log({result});
+```
+
+Shows...
+
+```json
+{
+    "result": {
+        "value0": {
+            "timestamp": "6.242000",
+            "addr": "c02027e0",
+            "v1": "c0202010",
+            "v2": "00000000",
+            "v3": "00000001",
+            "v4": "00000000",
+            "v5": "00000000",
+            "v6": "00000000",
+            "v7": "8000ad8a",
+            "v8": "00000000"
+        }
+    }
+}
+```
+
+_What if the parsing fails?_
+
+We'll see `result.error`...
+
+```json
+{
+    "result": {
+        "value0": {
+            "pos": 0,
+            "error": "Expected '['."
+        }
+    }
+}
+```
+
+So we can run `parseStackDump` on every line of NuttX Log. And skip the lines with `result.error`
+
 TODO: Spot interesting addresses like 8000ad8a, c0202010
 
 # Compile PureScript to JavaScript in Web Browser
