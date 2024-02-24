@@ -254,6 +254,29 @@ Shows...
 }
 ```
 
+# BigInt in PureScript
+
+_Why are we passing addresses in Text instead of Numbers? Like `8000ad8a`_
+
+That's because 0x8000ad8a is too big for PureScript Int, a signed 32-bit integer. PureScript Int is meant to interoperate with JavaScript Integer, which is also 32-bit.
+
+_What about PureScript BigInt?_
+
+```bash
+spago install bigints
+npm install big-integer
+```
+
+If we use [PureScript BigInt](https://pursuit.purescript.org/packages/purescript-bigints/7.0.1/docs/Data.BigInt#t:BigInt), then we need NPM big-integer.
+
+But NPM big-integer won't run inside a Web Browser with Plain Old JavaScript. That's why we're passing addresses as Strings instead of Numbers.
+
+# Lookup Addresses in NuttX Disassembly
+
+_Given an Exception Address like 8000ad8a, can we show the NuttX Disassembly?_
+
+TODO: Need to chunk nuttx.S by address: nuttx-8000ad90.S, nuttx-8000ae00.S, nuttx-8000b000.S, nuttx-80010000.S
+
 # Run parseCSV in Node.js
 
 Let's run parseCSV in [src/Main.purs](src/Main.purs). Normally we run PureScript like this...
