@@ -22,16 +22,23 @@ import StringParser (Parser, anyChar, between, char, endBy1, eof, fail, lookAhea
 main :: Effect Unit
 main = printResults
 
--- Parse the NuttX Exception and NuttX Stack Dump.
+-- Parse the NuttX Exception and NuttX Stack Dump. Explain the NuttX Exception.
 -- `Effect` says that it will do Side Effects (printing to console)
 -- `Unit` means that no value will be returned
 -- The next line declares the Function Type. We can actually erase it, VSCode PureScript Extension will helpfully suggest it for us.
 printResults :: Effect Unit
 printResults = do
+
+  -- Explain the NuttX Exception.
+  -- `$ something something` is shortcut for `( something something )`
   log $ explainException 12 "epc" "mtval"
   log $ explainException 0 "epc" "mtval"
+
+  -- Parse the NuttX Exception
   doRunParser "parseException" parseException
     "riscv_exception: EXCEPTION: Instruction page fault. MCAUSE: 000000000000000c, EPC: 000000008000ad8a, MTVAL: 000000008000ad8a"
+
+  -- Parse the line of NuttX Stack Dump
   doRunParser "parseStackDump" parseStackDump
     "[    6.242000] stack_dump: 0xc02027e0: c0202010 00000000 00000001 00000000 00000000 00000000 8000ad8a 00000000"
 
@@ -39,8 +46,12 @@ printResults = do
 -- Explain in friendly words: "NuttX stopped because it tried to read or write an Invalid Address. The Invalid Address is 8000ad8a. The code that caused this is at 8000ad8a. Check the NuttX Disassembly for the Source Code of the crashing line."
 -- The next line declares the Function Type. We can actually erase it, VSCode PureScript Extension will helpfully suggest it for us.
 explainException ∷ Int → String → String → String
+
+-- Explain the NuttX Exception with mcause 12
 explainException 12 epc mtval =
   "Instruction Page Fault at " <> epc <> ", " <> mtval
+
+-- Explain the Other NuttX Exceptions, that are not matched with the above
 explainException mcause epc mtval =
   "Unknown Exception: mcause=" <> show mcause <> ", epc=" <> epc <> ", mtval=" <> mtval
 
