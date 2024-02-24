@@ -16,7 +16,9 @@ _Why not code all this in JavaScript instead of PureScript?_
 
 (1) NuttX Logs might appear differently over time. Good to have a quick way to patch our parser as the NuttX Logs change.
 
-(2) We need to implement High-Level Rules that will interpret the NuttX Logs. We might adjust the Rules over time.
+(2) We need to implement high-level Declarative Rules that will interpret the parsed NuttX Logs. We might adjust the Rules over time.
+
+(FYI Parsing CSV in JavaScript [looks like this](https://github.com/Chevrotain/chevrotain/blob/master/examples/grammars/csv/csv.js))
 
 _Why PureScript instead of Haskell?_
 
@@ -199,14 +201,68 @@ Let's parse the [NuttX Exception](https://gist.github.com/lupyuen/a715e4e77c011d
 
 ```text
 [    6.242000] riscv_exception: EXCEPTION: Instruction page fault. MCAUSE: 000000000000000c, EPC: 000000008000ad8a, MTVAL: 000000008000ad8a
-[    6.242000] riscv_exception: PANIC!!! Exception = 000000000000000c
-[    6.242000] _assert: Current Version: NuttX  12.4.0 f8b0b06b978 Jan 29 2024 01:16:20 risc-v
-[    6.242000] _assert: Assertion failed panic: at file: common/riscv_exception.c:85 task: /system/bin/init process: /system/bin/init 0xc000001a
 ```
 
-TODO
+Here's how we parse the NuttX Exception in PureScript: [src/Main.purs](src/Main.purs)
 
-From [test.html](test.html):
+```purescript
+-- Parse the NuttX Exception.
+-- Given this NuttX Exception: `riscv_exception: EXCEPTION: Instruction page fault. MCAUSE: 000000000000000c, EPC: 000000008000ad8a, MTVAL: 000000008000ad8a`
+-- Result: { epc: "000000008000ad8a", exception: "Instruction page fault", mcause: 12, mtval: "000000008000ad8a" }
+-- The next line declares the Function Type. We can actually erase it, VSCode PureScript Extension will helpfully suggest it for us.
+parseException ∷ Parser { exception ∷ String, mcause :: Int, epc :: String, mtval :: String }
+parseException = do
+
+  -- To parse the line: `riscv_exception: EXCEPTION: Instruction page fault. MCAUSE: 000000000000000c, EPC: 000000008000ad8a, MTVAL: 000000008000ad8a`
+  -- Skip `riscv_exception: EXCEPTION: `
+  -- `void` means ignore the Text Captured
+  -- `$ something something` is shortcut for `( something something )`
+  -- `<*` is the Delimiter between Patterns
+  void $
+    string "riscv_exception:" -- Match the string `riscv_exception:`
+    <* skipSpaces             -- Skip the following spaces
+    <* string "EXCEPTION:"    -- Match the string `EXCEPTION:`
+    <* skipSpaces             -- Skip the following spaces
+
+  -- `exception` becomes `Instruction page fault`
+  -- `<*` says when we should stop the Text Capture
+  exception <- regex "[^.]+" 
+    <* string "." 
+    <* skipSpaces 
+
+  -- Skip `MCAUSE: `
+  -- `void` means ignore the Text Captured
+  -- `$ something something` is shortcut for `( something something )`
+  -- `<*` is the Delimiter between Patterns
+  void $ string "MCAUSE:" <* skipSpaces
+
+  -- `mcauseStr` becomes `000000000000000c`
+  -- We'll convert to integer later
+  mcauseStr <- regex "[0-9a-f]+" <* string "," <* skipSpaces
+
+  -- Skip `EPC: `
+  -- `epc` becomes `000000008000ad8a`
+  void $ string "EPC:" <* skipSpaces
+  epc <- regex "[0-9a-f]+" <* string "," <* skipSpaces
+
+  -- Skip `MTVAL: `
+  -- `mtval` becomes `000000008000ad8a`
+  void $ string "MTVAL:" <* skipSpaces
+  mtval <- regex "[0-9a-f]+"
+
+  -- Return the parsed content
+  -- `pure` because we're in a `do` block that allows (Side) Effects
+  pure 
+    {
+      exception
+    , mcause: -1 `fromMaybe`               -- If `mcauseStr` is not a valid hex, return -1
+        fromStringAs hexadecimal mcauseStr -- Else return the hex value of `mcauseStr`
+    , epc
+    , mtval
+    }
+```
+
+We can run it in Web Browser JavaScript: [test.html](test.html)
 
 ```javascript
   // Run parseException
@@ -219,7 +275,7 @@ From [test.html](test.html):
   console.log({result1});
 ```
 
-Shows...
+Which shows...
 
 ```json
 {
@@ -236,9 +292,28 @@ Shows...
 
 # Explain NuttX Exception with PureScript
 
-TODO: Explain in friendly words what the NuttX Exception means: "NuttX crashed because it tried to read or write an Invalid Address. The Invalid Address is 8000ad8a. The code that caused this is at 8000ad8a. Check the NuttX Disassembly for the Source Code of the crashing line."
+We explain in friendly words what the NuttX Exception means...
 
-From [test.html](test.html):
+"NuttX crashed because it tried to read or write an Invalid Address. The Invalid Address is 8000ad8a. The code that caused this is at 8000ad8a. Check the NuttX Disassembly for the Source Code of the crashing line."
+
+Here's how we explain the NuttX Exception in PureScript: [src/Main.purs](src/Main.purs)
+
+```purescript
+-- Given this NuttX Exception: `riscv_exception: EXCEPTION: Instruction page fault. MCAUSE: 000000000000000c, EPC: 000000008000ad8a, MTVAL: 000000008000ad8a`
+-- Explain in friendly words: "NuttX stopped because it tried to read or write an Invalid Address. The Invalid Address is 8000ad8a. The code that caused this is at 8000ad8a. Check the NuttX Disassembly for the Source Code of the crashing line."
+-- The next line declares the Function Type. We can actually erase it, VSCode PureScript Extension will helpfully suggest it for us.
+explainException ∷ Int → String → String → String
+
+-- Explain the NuttX Exception with mcause 12
+explainException 12 epc mtval =
+  "Instruction Page Fault at " <> epc <> ", " <> mtval
+
+-- Explain the Other NuttX Exceptions, that are not matched with the above
+explainException mcause epc mtval =
+  "Unknown Exception: mcause=" <> show mcause <> ", epc=" <> epc <> ", mtval=" <> mtval
+```
+
+We can run it in Web Browser JavaScript: [test.html](test.html)
 
 ```javascript
   // Run explainException
@@ -246,7 +321,7 @@ From [test.html](test.html):
   console.log({result2});
 ```
 
-Shows...
+Which shows...
 
 ```json
 {
