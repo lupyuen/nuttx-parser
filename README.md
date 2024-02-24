@@ -6,11 +6,13 @@ What if we could Analyse the NuttX Logs in Real-Time? And show the results in th
 
 Like for [Stack Dumps](https://gist.github.com/lupyuen/a715e4e77c011d610d0b418e97f8bf5d#file-nuttx-tcc-app-log-L168-L224), [ELF Loader Log](https://gist.github.com/lupyuen/a715e4e77c011d610d0b418e97f8bf5d#file-nuttx-tcc-app-log-L1-L167), [Memory Manager Log](https://docs.google.com/spreadsheets/d/1g0-O2qdgjwNfSIxfayNzpUN8mmMyWFmRf2dMyQ9a8JI/edit#gid=0) (malloc / free)?
 
-(Also automate the [Stack Dump Analysis](https://nuttx.apache.org/docs/latest/guides/cortexmhardfaults.html#))
-
 Let's do it with PureScript, since Functional Languages are better for Parsing Text.
 
 And we'll support Online Scripting of our PureScript for Log Parsing, similar to [try.purescript.org](https://try.purescript.org/)
+
+(Also automate the [Stack Dump Analysis](https://nuttx.apache.org/docs/latest/guides/cortexmhardfaults.html#))
+
+(Here's a [NuttX Emulator that crashes](https://lupyuen.github.io/nuttx-tinyemu/purescript/). Guess why?)
 
 _Why not code all this in JavaScript instead of PureScript?_
 
