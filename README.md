@@ -24,170 +24,6 @@ Right now our NuttX Logs are accessible in a Web Browser through JavaScript: Nut
 
 PureScript is probably easier to run in a Web Browser for processing the JavaScript Logs.
 
-# Run parseCSV in Node.js
-
-Let's run parseCSV in [src/Main.purs](src/Main.purs). Normally we run PureScript like this...
-
-```bash
-spago run
-```
-
-This is how we run it in Node.js...
-
-```bash
-$ spago build
-$ node .spago/run.js
-
-### Example Content 1 ###
-(runParser) Parsing content with 'fail'
-{ error: "example failure message", pos: 0 }
------
-(unParser) Parsing content with 'fail'
-Position: 0
-Error: "example failure message"
------
-(runParser) Parsing content with 'numberOfAs'
-Result was: 6
------
-(unParser) Parsing content with 'numberOfAs'
-Result was: 6
-Suffix was: { position: 59, substring: "" }
------
-(runParser) Parsing content with 'removePunctuation'
-Result was: "How many as are in this sentence you ask Not that many"
------
-(unParser) Parsing content with 'removePunctuation'
-Result was: "How many as are in this sentence you ask Not that many"
-Suffix was: { position: 59, substring: "" }
------
-(runParser) Parsing content with 'replaceVowelsWithUnderscore'
-Result was: "H_w m_ny '_'s _r_ _n th_s s_nt_nc_, y__ _sk? N_t th_t m_ny."
------
-(unParser) Parsing content with 'replaceVowelsWithUnderscore'
-Result was: "H_w m_ny '_'s _r_ _n th_s s_nt_nc_, y__ _sk? N_t th_t m_ny."
-Suffix was: { position: 59, substring: "" }
------
-(runParser) Parsing content with 'tokenizeContentBySpaceChars'
-Result was: (NonEmptyList (NonEmpty "How" ("many" : "'a's" : "are" : "in" : "this" : "sentence," : "you" : "ask?" : "Not" : "that" : "many." : Nil)))
------
-(unParser) Parsing content with 'tokenizeContentBySpaceChars'
-Result was: (NonEmptyList (NonEmpty "How" ("many" : "'a's" : "are" : "in" : "this" : "sentence," : "you" : "ask?" : "Not" : "that" : "many." : Nil)))
-Suffix was: { position: 59, substring: "" }
------
-(runParser) Parsing content with 'extractWords'
-Result was: (NonEmptyList (NonEmpty "How" ("many" : "a" : "s" : "are" : "in" : "this" : "sentence" : "you" : "ask" : "Not" : "that" : "many" : Nil)))
------
-(unParser) Parsing content with 'extractWords'
-Result was: (NonEmptyList (NonEmpty "How" ("many" : "a" : "s" : "are" : "in" : "this" : "sentence" : "you" : "ask" : "Not" : "that" : "many" : Nil)))
-Suffix was: { position: 59, substring: "" }
------
-(runParser) Parsing content with 'badExtractWords'
-{ error: "Could not find a character that separated the content...", pos: 43 }
------
-(unParser) Parsing content with 'badExtractWords'
-Position: 43
-Error: "Could not find a character that separated the content..."
------
-(runParser) Parsing content with 'quotedLetterExists'
-Result was: true
------
-(unParser) Parsing content with 'quotedLetterExists'
-Result was: true
-Suffix was: { position: 59, substring: "" }
------
-
-### Example Content 2 ###
-(runParser) Parsing content with 'parseCSV'
-Result was: { age: "24", firstName: "Mark", idNumber: "523", lastName: "Kenderson", modifiedEmail: "mynameismark@mark.mark.com", originalEmail: "my.name.is.mark@mark.mark.com" }
------
-(unParser) Parsing content with 'parseCSV'
-Result was: { age: "24", firstName: "Mark", idNumber: "523", lastName: "Kenderson", modifiedEmail: "mynameismark@mark.mark.com", originalEmail: "my.name.is.mark@mark.mark.com" }
-Suffix was: { position: 110, substring: "" }
------
-```
-
-# Run parseCSV in Web Browser
-
-Here's how we run [parseCSV](src/Main.purs) in the Web Browser: [test.html](test.html)
-
-```javascript
-  // Import Main Module
-  import { main, doBoth, doRunParser, parseCSV, exampleContent2 } from './output/Main/index.js';
-  import * as StringParser_Parser from "./output/StringParser.Parser/index.js";
-
-  // Run parseCSV
-  const result = StringParser_Parser
-    .runParser
-    (parseCSV)
-    (exampleContent2)
-    ;
-  console.log({result});
-```
-
-Output:
-
-```json
-{
-    "result": {
-        "value0": {
-            "idNumber": "523",
-            "firstName": "Mark",
-            "lastName": "Kenderson",
-            "age": "24",
-            "originalEmail": "my.name.is.mark@mark.mark.com",
-            "modifiedEmail": "mynameismark@mark.mark.com"
-        }
-    }
-}
-```
-
-TODO: Change `exampleContent2` to parse our [NuttX Log](https://gist.github.com/lupyuen/a715e4e77c011d610d0b418e97f8bf5d)
-
-We expose the PureScript Functions in the Web Browser: [test.html](test.html)
-
-```javascript
-// Import Main Module
-import { main, doBoth, doRunParser, parseCSV, exampleContent2 } from './output/Main/index.js';
-import * as StringParser_Parser from "./output/StringParser.Parser/index.js";
-
-// For Testing: Export the PureScript Functions
-window.main = main;
-window.doBoth = doBoth;
-window.doRunParser = doRunParser;
-window.parseCSV = parseCSV;
-window.exampleContent2 = exampleContent2;
-window.StringParser_Parser = StringParser_Parser;
-```
-
-So we can run experiments in the JavaScript Console...
-
-```javascript
-// Run parseCSV in JavaScript Console
-window.StringParser_Parser
-  .runParser
-  (window.parseCSV)
-  (window.exampleContent2)
-```
-
-# Run parseCSV in try.purescript.org
-
-To run parseCSV at [try.purescript.org](https://try.purescript.org/), change...
-
-```purescript
-main :: Effect Unit
-main = printResults
-```
-
-To this...
-
-```purescript
-import TryPureScript (render, withConsole)
-
-main :: Effect Unit
-main = render =<< withConsole do
-  printResults
-```
-
 # Parse NuttX Stack Dump with PureScript
 
 Let's parse the [NuttX Stack Dump](https://gist.github.com/lupyuen/a715e4e77c011d610d0b418e97f8bf5d#file-nuttx-tcc-app-log-L168-L224)...
@@ -223,15 +59,16 @@ Let's try this single line...
 Here's our parser in PureScript: [src/Main.purs](src/Main.purs)
 
 ```purescript
--- Parse the NuttX Stack Dump
+-- Parse the NuttX Stack Dump.
+-- The next line declares the Function Type. We can actually erase it, VSCode PureScript Extension will helpfully suggest it for us.
 printResults :: Effect Unit
 printResults = do
   doRunParser "parseStackDump" parseStackDump
     "[    6.242000] stack_dump: 0xc02027e0: c0202010 00000000 00000001 00000000 00000000 00000000 8000ad8a 00000000"
 
--- Parse a line of NuttX Stack Dump
+-- Parse a line of NuttX Stack Dump.
 -- Result: { addr: "c02027e0", timestamp: "6.242000", v1: "c0202010", v2: "00000000", v3: "00000001", v4: "00000000", v5: "00000000", v6: "00000000", v7: "8000ad8a", v8: "00000000" }
--- The next line declares the Type. We can actually erase it, VS Code PureScript Extension will helpfully suggest it for us.
+-- The next line declares the Function Type. We can actually erase it, VSCode PureScript Extension will helpfully suggest it for us.
 parseStackDump ∷ Parser { addr ∷ String , timestamp ∷ String , v1 ∷ String , v2 ∷ String , v3 ∷ String , v4 ∷ String , v5 ∷ String , v6 ∷ String , v7 ∷ String , v8 ∷ String }
 parseStackDump = do
 
@@ -415,6 +252,170 @@ Shows...
 {
     "result2": "Instruction Page Fault at 000000008000ad8a, 000000008000ad8a"
 }
+```
+
+# Run parseCSV in Node.js
+
+Let's run parseCSV in [src/Main.purs](src/Main.purs). Normally we run PureScript like this...
+
+```bash
+spago run
+```
+
+This is how we run it in Node.js...
+
+```bash
+$ spago build
+$ node .spago/run.js
+
+### Example Content 1 ###
+(runParser) Parsing content with 'fail'
+{ error: "example failure message", pos: 0 }
+-----
+(unParser) Parsing content with 'fail'
+Position: 0
+Error: "example failure message"
+-----
+(runParser) Parsing content with 'numberOfAs'
+Result was: 6
+-----
+(unParser) Parsing content with 'numberOfAs'
+Result was: 6
+Suffix was: { position: 59, substring: "" }
+-----
+(runParser) Parsing content with 'removePunctuation'
+Result was: "How many as are in this sentence you ask Not that many"
+-----
+(unParser) Parsing content with 'removePunctuation'
+Result was: "How many as are in this sentence you ask Not that many"
+Suffix was: { position: 59, substring: "" }
+-----
+(runParser) Parsing content with 'replaceVowelsWithUnderscore'
+Result was: "H_w m_ny '_'s _r_ _n th_s s_nt_nc_, y__ _sk? N_t th_t m_ny."
+-----
+(unParser) Parsing content with 'replaceVowelsWithUnderscore'
+Result was: "H_w m_ny '_'s _r_ _n th_s s_nt_nc_, y__ _sk? N_t th_t m_ny."
+Suffix was: { position: 59, substring: "" }
+-----
+(runParser) Parsing content with 'tokenizeContentBySpaceChars'
+Result was: (NonEmptyList (NonEmpty "How" ("many" : "'a's" : "are" : "in" : "this" : "sentence," : "you" : "ask?" : "Not" : "that" : "many." : Nil)))
+-----
+(unParser) Parsing content with 'tokenizeContentBySpaceChars'
+Result was: (NonEmptyList (NonEmpty "How" ("many" : "'a's" : "are" : "in" : "this" : "sentence," : "you" : "ask?" : "Not" : "that" : "many." : Nil)))
+Suffix was: { position: 59, substring: "" }
+-----
+(runParser) Parsing content with 'extractWords'
+Result was: (NonEmptyList (NonEmpty "How" ("many" : "a" : "s" : "are" : "in" : "this" : "sentence" : "you" : "ask" : "Not" : "that" : "many" : Nil)))
+-----
+(unParser) Parsing content with 'extractWords'
+Result was: (NonEmptyList (NonEmpty "How" ("many" : "a" : "s" : "are" : "in" : "this" : "sentence" : "you" : "ask" : "Not" : "that" : "many" : Nil)))
+Suffix was: { position: 59, substring: "" }
+-----
+(runParser) Parsing content with 'badExtractWords'
+{ error: "Could not find a character that separated the content...", pos: 43 }
+-----
+(unParser) Parsing content with 'badExtractWords'
+Position: 43
+Error: "Could not find a character that separated the content..."
+-----
+(runParser) Parsing content with 'quotedLetterExists'
+Result was: true
+-----
+(unParser) Parsing content with 'quotedLetterExists'
+Result was: true
+Suffix was: { position: 59, substring: "" }
+-----
+
+### Example Content 2 ###
+(runParser) Parsing content with 'parseCSV'
+Result was: { age: "24", firstName: "Mark", idNumber: "523", lastName: "Kenderson", modifiedEmail: "mynameismark@mark.mark.com", originalEmail: "my.name.is.mark@mark.mark.com" }
+-----
+(unParser) Parsing content with 'parseCSV'
+Result was: { age: "24", firstName: "Mark", idNumber: "523", lastName: "Kenderson", modifiedEmail: "mynameismark@mark.mark.com", originalEmail: "my.name.is.mark@mark.mark.com" }
+Suffix was: { position: 110, substring: "" }
+-----
+```
+
+# Run parseCSV in Web Browser
+
+Here's how we run [parseCSV](src/Main.purs) in the Web Browser: [test.html](test.html)
+
+```javascript
+  // Import Main Module
+  import { main, doBoth, doRunParser, parseCSV, exampleContent2 } from './output/Main/index.js';
+  import * as StringParser_Parser from "./output/StringParser.Parser/index.js";
+
+  // Run parseCSV
+  const result = StringParser_Parser
+    .runParser
+    (parseCSV)
+    (exampleContent2)
+    ;
+  console.log({result});
+```
+
+Output:
+
+```json
+{
+    "result": {
+        "value0": {
+            "idNumber": "523",
+            "firstName": "Mark",
+            "lastName": "Kenderson",
+            "age": "24",
+            "originalEmail": "my.name.is.mark@mark.mark.com",
+            "modifiedEmail": "mynameismark@mark.mark.com"
+        }
+    }
+}
+```
+
+TODO: Change `exampleContent2` to parse our [NuttX Log](https://gist.github.com/lupyuen/a715e4e77c011d610d0b418e97f8bf5d)
+
+We expose the PureScript Functions in the Web Browser: [test.html](test.html)
+
+```javascript
+// Import Main Module
+import { main, doBoth, doRunParser, parseCSV, exampleContent2 } from './output/Main/index.js';
+import * as StringParser_Parser from "./output/StringParser.Parser/index.js";
+
+// For Testing: Export the PureScript Functions
+window.main = main;
+window.doBoth = doBoth;
+window.doRunParser = doRunParser;
+window.parseCSV = parseCSV;
+window.exampleContent2 = exampleContent2;
+window.StringParser_Parser = StringParser_Parser;
+```
+
+So we can run experiments in the JavaScript Console...
+
+```javascript
+// Run parseCSV in JavaScript Console
+window.StringParser_Parser
+  .runParser
+  (window.parseCSV)
+  (window.exampleContent2)
+```
+
+# Run parseCSV in try.purescript.org
+
+To run parseCSV at [try.purescript.org](https://try.purescript.org/), change...
+
+```purescript
+main :: Effect Unit
+main = printResults
+```
+
+To this...
+
+```purescript
+import TryPureScript (render, withConsole)
+
+main :: Effect Unit
+main = render =<< withConsole do
+  printResults
 ```
 
 # Compile PureScript to JavaScript in Web Browser

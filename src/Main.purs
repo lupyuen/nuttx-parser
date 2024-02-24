@@ -14,30 +14,37 @@ import Effect (Effect)
 import Effect.Console (log, logShow)
 import StringParser (Parser, anyChar, between, char, endBy1, eof, fail, lookAhead, many, many1, regex, runParser, sepBy1, skipSpaces, string, unParser, (<?>))
 
--- Serves only to make this file runnable
+-- Main Function that will run our Test Code.
+-- `Effect` says that it will do Side Effects (printing to console)
+-- `Unit` means that no value will be returned
+-- The next line declares the Function Type. We can actually erase it, VSCode PureScript Extension will helpfully suggest it for us.
 main :: Effect Unit
 main = printResults
 
--- Parse the NuttX Exception and NuttX Stack Dump
+-- Parse the NuttX Exception and NuttX Stack Dump.
+-- The next line declares the Function Type. We can actually erase it, VSCode PureScript Extension will helpfully suggest it for us.
 printResults :: Effect Unit
 printResults = do
+  log $ explainException 12 "epc" "mtval"
+  log $ explainException 0 "epc" "mtval"
   doRunParser "parseException" parseException
     "riscv_exception: EXCEPTION: Instruction page fault. MCAUSE: 000000000000000c, EPC: 000000008000ad8a, MTVAL: 000000008000ad8a"
   doRunParser "parseStackDump" parseStackDump
     "[    6.242000] stack_dump: 0xc02027e0: c0202010 00000000 00000001 00000000 00000000 00000000 8000ad8a 00000000"
-  log $ explainException 12 "epc" "mtval"
-  log $ explainException 0 "epc" "mtval"
 
 -- Given this NuttX Exception: `riscv_exception: EXCEPTION: Instruction page fault. MCAUSE: 000000000000000c, EPC: 000000008000ad8a, MTVAL: 000000008000ad8a`
 -- Explain in friendly words: "NuttX stopped because it tried to read or write an Invalid Address. The Invalid Address is 8000ad8a. The code that caused this is at 8000ad8a. Check the NuttX Disassembly for the Source Code of the crashing line."
+-- The next line declares the Function Type. We can actually erase it, VSCode PureScript Extension will helpfully suggest it for us.
 explainException ∷ Int → String → String → String
 explainException 12 epc mtval =
   "Instruction Page Fault at " <> epc <> ", " <> mtval
 explainException mcause epc mtval =
   "Unknown Exception: mcause=" <> show mcause <> ", epc=" <> epc <> ", mtval=" <> mtval
 
--- Parse the NuttX Exception
+-- Parse the NuttX Exception.
+-- Given this NuttX Exception: `riscv_exception: EXCEPTION: Instruction page fault. MCAUSE: 000000000000000c, EPC: 000000008000ad8a, MTVAL: 000000008000ad8a`
 -- Result: { epc: "000000008000ad8a", exception: "Instruction page fault", mcause: 12, mtval: "000000008000ad8a" }
+-- The next line declares the Function Type. We can actually erase it, VSCode PureScript Extension will helpfully suggest it for us.
 parseException ∷ Parser { exception ∷ String, mcause :: Int, epc :: String, mtval :: String }
 parseException = do
 
@@ -89,9 +96,10 @@ parseException = do
     , mtval
     }
 
--- Parse a line of NuttX Stack Dump
+-- Parse a line of NuttX Stack Dump.
+-- Given this line of NuttX Stack Dump: `[    6.242000] stack_dump: 0xc02027e0: c0202010 00000000 00000001 00000000 00000000 00000000 8000ad8a 00000000`
 -- Result: { addr: "c02027e0", timestamp: "6.242000", v1: "c0202010", v2: "00000000", v3: "00000001", v4: "00000000", v5: "00000000", v6: "00000000", v7: "8000ad8a", v8: "00000000" }
--- The next line declares the Type. We can actually erase it, VS Code PureScript Extension will helpfully suggest it for us.
+-- The next line declares the Function Type. We can actually erase it, VSCode PureScript Extension will helpfully suggest it for us.
 parseStackDump ∷ Parser { addr ∷ String , timestamp ∷ String , v1 ∷ String , v2 ∷ String , v3 ∷ String , v4 ∷ String , v5 ∷ String , v6 ∷ String , v7 ∷ String , v8 ∷ String }
 parseStackDump = do
 
