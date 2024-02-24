@@ -16,6 +16,12 @@ _Why not code all this in JavaScript instead of PureScript?_
 
 (2) We need to implement High-Level Rules that will interpret the NuttX Logs. We might adjust the Rules over time.
 
+_Why PureScript instead of Haskell?_
+
+Right now our NuttX Logs are accessible in a Web Browser through JavaScript: NuttX Emulator (over WebAssembly) and NuttX Device (over Web Serial API).
+
+PureScript is probably easier to run in a Web Browser for processing the JavaScript Logs.
+
 # Run parseCSV in Node.js
 
 Let's run parseCSV in [src/Main.purs](src/Main.purs). Normally we run PureScript like this...
@@ -447,6 +453,6 @@ And explain in friendly words what this means: "NuttX crashed because it tried t
 
 TODO
 
-# Interpret NuttX Exception with PureScript
+# Explain NuttX Exception with PureScript
 
 TODO: Explain in friendly words what the NuttX Exception means: "NuttX crashed because it tried to read or write an Invalid Address. The Invalid Address is 8000ad8a. The code that caused this is at 8000ad8a. Check the NuttX Disassembly for the Source Code of the crashing line."
