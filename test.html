@@ -3,7 +3,7 @@
 </body>
 <script type=module>
   // Import Main Module
-  import { main, doBoth, doRunParser, parseCSV, exampleContent2, parseStackDump } from './output/Main/index.js';
+  import { main, doBoth, doRunParser, parseCSV, exampleContent2, parseStackDump, explainException } from './output/Main/index.js';
   import * as StringParser_Parser from "./output/StringParser.Parser/index.js";
 
   // For Testing: Export the PureScript Functions
@@ -14,6 +14,7 @@
   window.exampleContent2 = exampleContent2;
   window.StringParser_Parser = StringParser_Parser;
   window.parseStackDump = parseStackDump;
+  window.explainException = explainException;
 
   // Run parseStackDump
   console.log('Running parseStackDump...');

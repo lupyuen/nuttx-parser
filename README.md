@@ -446,3 +446,7 @@ Let's parse the [NuttX Exception](https://gist.github.com/lupyuen/a715e4e77c011d
 And explain in friendly words what this means: "NuttX crashed because it tried to read or write an Invalid Address. The Invalid Address is 8000ad8a. The code that caused this is at 8000ad8a. Check the NuttX Disassembly for the Source Code of the crashing line."
 
 TODO
+
+# Interpret NuttX Exception with PureScript
+
+TODO: Explain in friendly words what the NuttX Exception means: "NuttX crashed because it tried to read or write an Invalid Address. The Invalid Address is 8000ad8a. The code that caused this is at 8000ad8a. Check the NuttX Disassembly for the Source Code of the crashing line."
