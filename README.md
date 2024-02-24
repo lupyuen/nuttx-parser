@@ -6,6 +6,8 @@ What if we could Analyse the NuttX Logs in Real-Time? And show the results in th
 
 Like for [Stack Dumps](https://gist.github.com/lupyuen/a715e4e77c011d610d0b418e97f8bf5d#file-nuttx-tcc-app-log-L168-L224), [ELF Loader Log](https://gist.github.com/lupyuen/a715e4e77c011d610d0b418e97f8bf5d#file-nuttx-tcc-app-log-L1-L167), [Memory Manager Log](https://docs.google.com/spreadsheets/d/1g0-O2qdgjwNfSIxfayNzpUN8mmMyWFmRf2dMyQ9a8JI/edit#gid=0) (malloc / free)?
 
+(Also automate the [Stack Dump Analysis](https://nuttx.apache.org/docs/latest/guides/cortexmhardfaults.html#))
+
 Let's do it with PureScript, since Functional Languages are better for Parsing Text.
 
 And we'll support Online Scripting of our PureScript for Log Parsing, similar to [try.purescript.org](https://try.purescript.org/)
@@ -354,6 +356,51 @@ So we can run `parseStackDump` on every line of NuttX Log. And skip the lines wi
 
 TODO: Spot interesting addresses like 8000ad8a, c0202010
 
+# Parse NuttX Exception with PureScript
+
+Let's parse the [NuttX Exception](https://gist.github.com/lupyuen/a715e4e77c011d610d0b418e97f8bf5d#file-nuttx-tcc-app-log-L168-L224)...
+
+```text
+[    6.242000] riscv_exception: EXCEPTION: Instruction page fault. MCAUSE: 000000000000000c, EPC: 000000008000ad8a, MTVAL: 000000008000ad8a
+[    6.242000] riscv_exception: PANIC!!! Exception = 000000000000000c
+[    6.242000] _assert: Current Version: NuttX  12.4.0 f8b0b06b978 Jan 29 2024 01:16:20 risc-v
+[    6.242000] _assert: Assertion failed panic: at file: common/riscv_exception.c:85 task: /system/bin/init process: /system/bin/init 0xc000001a
+```
+
+And explain in friendly words what this means: "NuttX crashed because it tried to read or write an Invalid Address. The Invalid Address is 8000ad8a. The code that caused this is at 8000ad8a. Check the NuttX Disassembly for the Source Code of the crashing line."
+
+TODO
+
+```javascript
+  // Run parseException
+  const exception = `riscv_exception: EXCEPTION: Instruction page fault. MCAUSE: 000000000000000c, EPC: 000000008000ad8a, MTVAL: 000000008000ad8a`
+  const result1 = StringParser_Parser
+    .runParser
+    (parseException)
+    (exception)
+    ;
+  console.log({result1});
+```
+
+Shows...
+
+```json
+{
+    "result1": {
+        "value0": {
+            "exception": "Instruction page fault",
+            "mcause": 12,
+            "epc": "000000008000ad8a",
+            "mtval": "000000008000ad8a"
+        }
+    }
+}
+```
+
+# Explain NuttX Exception with PureScript
+
+TODO: Explain in friendly words what the NuttX Exception means: "NuttX crashed because it tried to read or write an Invalid Address. The Invalid Address is 8000ad8a. The code that caused this is at 8000ad8a. Check the NuttX Disassembly for the Source Code of the crashing line."
+
 # Compile PureScript to JavaScript in Web Browser
 
 Here's how we compile PureScript to JavaScript inside our Web Browser...
@@ -438,21 +485,3 @@ The JSON Response looks like this...
 }
 ```
 
-# Parse NuttX Exception with PureScript
-
-Let's parse the [NuttX Exception](https://gist.github.com/lupyuen/a715e4e77c011d610d0b418e97f8bf5d#file-nuttx-tcc-app-log-L168-L224)...
-
-```text
-[    6.242000] riscv_exception: EXCEPTION: Instruction page fault. MCAUSE: 000000000000000c, EPC: 000000008000ad8a, MTVAL: 000000008000ad8a
-[    6.242000] riscv_exception: PANIC!!! Exception = 000000000000000c
-[    6.242000] _assert: Current Version: NuttX  12.4.0 f8b0b06b978 Jan 29 2024 01:16:20 risc-v
-[    6.242000] _assert: Assertion failed panic: at file: common/riscv_exception.c:85 task: /system/bin/init process: /system/bin/init 0xc000001a
-```
-
-And explain in friendly words what this means: "NuttX crashed because it tried to read or write an Invalid Address. The Invalid Address is 8000ad8a. The code that caused this is at 8000ad8a. Check the NuttX Disassembly for the Source Code of the crashing line."
-
-TODO
-
-# Explain NuttX Exception with PureScript
-
-TODO: Explain in friendly words what the NuttX Exception means: "NuttX crashed because it tried to read or write an Invalid Address. The Invalid Address is 8000ad8a. The code that caused this is at 8000ad8a. Check the NuttX Disassembly for the Source Code of the crashing line."
