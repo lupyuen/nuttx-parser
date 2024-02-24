@@ -1,3 +1,4 @@
+-- Parse the NuttX Exception and NuttX Stack Dump. Explain the NuttX Exception.
 -- Based on https://github.com/purescript-contrib/purescript-string-parsers/blob/main/test/Examples.purs
 
 module Main where
@@ -22,6 +23,8 @@ main :: Effect Unit
 main = printResults
 
 -- Parse the NuttX Exception and NuttX Stack Dump.
+-- `Effect` says that it will do Side Effects (printing to console)
+-- `Unit` means that no value will be returned
 -- The next line declares the Function Type. We can actually erase it, VSCode PureScript Extension will helpfully suggest it for us.
 printResults :: Effect Unit
 printResults = do
