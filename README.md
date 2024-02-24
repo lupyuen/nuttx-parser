@@ -367,9 +367,9 @@ Let's parse the [NuttX Exception](https://gist.github.com/lupyuen/a715e4e77c011d
 [    6.242000] _assert: Assertion failed panic: at file: common/riscv_exception.c:85 task: /system/bin/init process: /system/bin/init 0xc000001a
 ```
 
-And explain in friendly words what this means: "NuttX crashed because it tried to read or write an Invalid Address. The Invalid Address is 8000ad8a. The code that caused this is at 8000ad8a. Check the NuttX Disassembly for the Source Code of the crashing line."
-
 TODO
+
+From [test.html](test.html):
 
 ```javascript
   // Run parseException
@@ -400,6 +400,22 @@ Shows...
 # Explain NuttX Exception with PureScript
 
 TODO: Explain in friendly words what the NuttX Exception means: "NuttX crashed because it tried to read or write an Invalid Address. The Invalid Address is 8000ad8a. The code that caused this is at 8000ad8a. Check the NuttX Disassembly for the Source Code of the crashing line."
+
+From [test.html](test.html):
+
+```javascript
+  // Run explainException
+  const result2 = explainException(12)('000000008000ad8a')('000000008000ad8a')
+  console.log({result2});
+```
+
+Shows...
+
+```json
+{
+    "result2": "Instruction Page Fault at 000000008000ad8a, 000000008000ad8a"
+}
+```
 
 # Compile PureScript to JavaScript in Web Browser
 
