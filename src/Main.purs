@@ -21,12 +21,16 @@ printResults :: Effect Unit
 printResults = do
   doRunParser "parseStackDump" parseStackDump
     "[    6.242000] stack_dump: 0xc02027e0: c0202010 00000000 00000001 00000000 00000000 00000000 8000ad8a 00000000"
+  log $ explainException 12 "epc" "mtval"
+  log $ explainException 0 "epc" "mtval"
 
 -- Given this NuttX Exception: `riscv_exception: EXCEPTION: Instruction page fault. MCAUSE: 000000000000000c, EPC: 000000008000ad8a, MTVAL: 000000008000ad8a`
 -- Explain in friendly words: "NuttX stopped because it tried to read or write an Invalid Address. The Invalid Address is 8000ad8a. The code that caused this is at 8000ad8a. Check the NuttX Disassembly for the Source Code of the crashing line."
-explainException ∷ Int → Int → Int → String
+explainException ∷ Int → String → String → String
+explainException 12 epc mtval =
+  "Instruction Page Fault at " <> epc <> ", " <> mtval
 explainException mcause epc mtval =
-  "TODO: explainException " <> show mcause <> ", " <> show epc <> ", " <> show mtval
+  "Unknown Exception: mcause=" <> show mcause <> ", epc=" <> epc <> ", mtval=" <> mtval
 
 -- Parse a line of NuttX Stack Dump
 -- Result: { addr: "c02027e0", timestamp: "6.242000", v1: "c0202010", v2: "00000000", v3: "00000001", v4: "00000000", v5: "00000000", v6: "00000000", v7: "8000ad8a", v8: "00000000" }
