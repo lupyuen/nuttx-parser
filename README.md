@@ -362,9 +362,14 @@ To run our PureScript Editor for NuttX...
 git clone https://github.com/lupyuen/nuttx-trypurescript
 cd nuttx-trypurescript
 cd client
+
 npm install
+## Produces `output` folder
 npm run serve:production
 ## Test at http://127.0.0.1:8080
+
+## Produces `client.js` bundle
+npm run build:production
 ```
 
 Copy [src/Main.purs](src/Main.purs) to the PureScript Editor.
