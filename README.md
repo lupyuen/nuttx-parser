@@ -356,7 +356,7 @@ TODO: Need to chunk nuttx.S by address: nuttx-8000ad90.S, nuttx-8000ae00.S, nutt
 
 # PureScript Editor for NuttX
 
-TODO
+To run our PureScript Editor for NuttX...
 
 ```bash
 git clone https://github.com/lupyuen/nuttx-trypurescript
@@ -365,6 +365,36 @@ cd client
 npm install
 npm run serve:production
 ## Test at http://127.0.0.1:8080
+```
+
+Copy [src/Main.purs](src/Main.purs) to the PureScript Editor.
+
+```purescript
+main :: Effect Unit
+main = printResults
+```
+
+To this...
+
+```purescript
+import TryPureScript (render, withConsole)
+
+main :: Effect Unit
+main = render =<< withConsole do
+  printResults
+```
+
+Our NuttX Parser Output appears...
+
+```text
+Instruction Page Fault at epc, mtval
+Unknown Exception: mcause=0, epc=epc, mtval=mtval
+(runParser) Parsing content with 'parseException'
+Result: { epc: "000000008000ad8a", exception: "Instruction page fault", mcause: 12, mtval: "000000008000ad8a" }
+-----
+(runParser) Parsing content with 'parseStackDump'
+Result: { addr: "c02027e0", timestamp: "6.242000", v1: "c0202010", v2: "00000000", v3: "00000001", v4: "00000000", v5: "00000000", v6: "00000000", v7: "8000ad8a", v8: "00000000" }
+-----
 ```
 
 # Run parseCSV in Node.js
