@@ -354,6 +354,19 @@ _Given an Exception Address like 8000ad8a, can we show the NuttX Disassembly?_
 
 TODO: Need to chunk nuttx.S by address: nuttx-8000ad90.S, nuttx-8000ae00.S, nuttx-8000b000.S, nuttx-80010000.S
 
+# PureScript Editor for NuttX
+
+TODO
+
+```bash
+git clone https://github.com/lupyuen/nuttx-trypurescript
+cd nuttx-trypurescript
+cd client
+npm install
+npm run serve:production
+## Test at http://127.0.0.1:8080
+```
+
 # Run parseCSV in Node.js
 
 Let's run parseCSV in [src/Main.purs](src/Main.purs). Normally we run PureScript like this...
