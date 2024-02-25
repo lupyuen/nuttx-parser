@@ -363,14 +363,24 @@ git clone https://github.com/lupyuen/nuttx-trypurescript
 cd nuttx-trypurescript
 cd client
 
+## Build and Test Locally:
 npm install
 ## Produces `output` folder
+## And `public/js/index.js`
 npm run serve:production
 ## Test at http://127.0.0.1:8080
 
-## Produces `client.js` bundle
-npm run build:production
+## Deploy to GitHub Pages:
+rm -r ../docs
+cp -r public ../docs
+simple-http-server .. &
+## Test at http://0.0.0.0:8000/docs/index.html
+
+## If we need `client.js` bundle:
+## npm run build:production
 ```
+
+Try it here: https://lupyuen.github.io/nuttx-trypurescript
 
 Copy [src/Main.purs](src/Main.purs) to the PureScript Editor.
 
@@ -401,6 +411,22 @@ Result: { epc: "000000008000ad8a", exception: "Instruction page fault", mcause: 
 Result: { addr: "c02027e0", timestamp: "6.242000", v1: "c0202010", v2: "00000000", v3: "00000001", v4: "00000000", v5: "00000000", v6: "00000000", v7: "8000ad8a", v8: "00000000" }
 -----
 ```
+
+The Generated Web Browser JavaScript looks like this...
+
+```html
+<script type="module">
+import * as Control_Alt from "https://compile.purescript.org/output/Control.Alt/index.js";
+import * as Control_Applicative from "https://compile.purescript.org/output/Control.Applicative/index.js";
+import * as Control_Apply from "https://compile.purescript.org/output/Control.Apply/index.js";
+...
+var bind = /* #__PURE__ */ Control_Bind.bind(StringParser_Parser.bindParser);
+var alt = /* #__PURE__ */ Control_Alt.alt(StringParser_Parser.altParser);
+var voidRight = /* #__PURE__ */ Data_Functor.voidRight(StringParser_Parser.functorParser);
+...
+```
+
+TODO: Where is Main Function?
 
 # Run parseCSV in Node.js
 
