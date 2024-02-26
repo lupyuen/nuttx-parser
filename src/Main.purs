@@ -41,7 +41,7 @@ printResults = do
 
   -- Parse the line of NuttX Stack Dump
   doRunParser "parseStackDump" parseStackDump
-    "[    6.242000] stack_dump: 0xc02027e0: c0202010 00000000 00000001 00000000 00000000 00000000 8000ad8a 00000000"
+    "stack_dump: 0xc02027e0: c0202010 00000000 00000001 00000000 00000000 00000000 8000ad8a 00000000"
 
 -- Given this NuttX Exception: `riscv_exception: EXCEPTION: Instruction page fault. MCAUSE: 000000000000000c, EPC: 000000008000ad8a, MTVAL: 000000008000ad8a`
 -- Explain in friendly words: "NuttX stopped because it tried to read or write an Invalid Address. The Invalid Address is 8000ad8a. The code that caused this is at 8000ad8a. Check the NuttX Disassembly for the Source Code of the crashing line."
@@ -116,27 +116,27 @@ parseException = do
     }
 
 -- Parse a line of NuttX Stack Dump.
--- Given this line of NuttX Stack Dump: `[    6.242000] stack_dump: 0xc02027e0: c0202010 00000000 00000001 00000000 00000000 00000000 8000ad8a 00000000`
+-- Given this line of NuttX Stack Dump: `stack_dump: 0xc02027e0: c0202010 00000000 00000001 00000000 00000000 00000000 8000ad8a 00000000`
 -- Result: { addr: "c02027e0", timestamp: "6.242000", v1: "c0202010", v2: "00000000", v3: "00000001", v4: "00000000", v5: "00000000", v6: "00000000", v7: "8000ad8a", v8: "00000000" }
 -- The next line declares the Function Type. We can actually erase it, VSCode PureScript Extension will helpfully suggest it for us.
-parseStackDump ∷ Parser { addr ∷ String , timestamp ∷ String , v1 ∷ String , v2 ∷ String , v3 ∷ String , v4 ∷ String , v5 ∷ String , v6 ∷ String , v7 ∷ String , v8 ∷ String }
+parseStackDump ∷ Parser { addr ∷ String , v1 ∷ String , v2 ∷ String , v3 ∷ String , v4 ∷ String , v5 ∷ String , v6 ∷ String , v7 ∷ String , v8 ∷ String }
 parseStackDump = do
 
-  -- To parse the line: `[    6.242000] stack_dump: 0xc02027e0: c0202010 00000000 00000001 00000000 00000000 00000000 8000ad8a 00000000`
+  -- To parse the line: `stack_dump: 0xc02027e0: c0202010 00000000 00000001 00000000 00000000 00000000 8000ad8a 00000000`
   -- Skip `[    `
   -- `void` means ignore the Text Captured
   -- `$ something something` is shortcut for `( something something )`
   -- `<*` is the Delimiter between Patterns
-  void $
-    string "["    -- Match the string `[`
-    <* skipSpaces -- Skip the following spaces
+  -- void $
+  --   string "["    -- Match the string `[`
+  --   <* skipSpaces -- Skip the following spaces
 
-  -- `timestamp` becomes `6.242000`
-  -- `<*` says when we should stop the Text Capture
-  timestamp <-
-    regex "[.0-9]+" 
-    <* string "]" 
-    <* skipSpaces
+  -- -- `timestamp` becomes `6.242000`
+  -- -- `<*` says when we should stop the Text Capture
+  -- timestamp <-
+  --   regex "[.0-9]+" 
+  --   <* string "]" 
+  --   <* skipSpaces
 
   -- Skip `stack_dump: `
   -- `void` means ignore the Text Captured
@@ -162,8 +162,7 @@ parseStackDump = do
   -- Return the parsed content
   -- `pure` because we're in a `do` block that allows (Side) Effects
   pure
-    { timestamp
-    , addr
+    { addr
     , v1
     , v2
     , v3

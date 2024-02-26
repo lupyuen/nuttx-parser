@@ -30,8 +30,21 @@ var disj = /* #__PURE__ */ Data_HeytingAlgebra.disj(Data_HeytingAlgebra.heytingA
 var discard = /* #__PURE__ */ Control_Bind.discard(Control_Bind.discardUnit);
 var discard1 = /* #__PURE__ */ discard(StringParser_Parser.bindParser);
 
-// To parse the line: `[    6.242000] stack_dump: 0xc02027e0: c0202010 00000000 00000001 00000000 00000000 00000000 8000ad8a 00000000`
+// To parse the line: `stack_dump: 0xc02027e0: c0202010 00000000 00000001 00000000 00000000 00000000 8000ad8a 00000000`
 // Skip `[    `
+// `void` means ignore the Text Captured
+// `$ something something` is shortcut for `( something something )`
+// `<*` is the Delimiter between Patterns
+// void $
+//   string "["    -- Match the string `[`
+//   <* skipSpaces -- Skip the following spaces
+// -- `timestamp` becomes `6.242000`
+// -- `<*` says when we should stop the Text Capture
+// timestamp <-
+//   regex "[.0-9]+" 
+//   <* string "]" 
+//   <* skipSpaces
+// Skip `stack_dump: `
 // `void` means ignore the Text Captured
 // `$ something something` is shortcut for `( something something )`
 // `<*` is the Delimiter between Patterns
@@ -83,35 +96,30 @@ var quotedLetterExists = /* #__PURE__ */ (function () {
 })();
 
 // Parse a line of NuttX Stack Dump.
-// Given this line of NuttX Stack Dump: `[    6.242000] stack_dump: 0xc02027e0: c0202010 00000000 00000001 00000000 00000000 00000000 8000ad8a 00000000`
+// Given this line of NuttX Stack Dump: `stack_dump: 0xc02027e0: c0202010 00000000 00000001 00000000 00000000 00000000 8000ad8a 00000000`
 // Result: { addr: "c02027e0", timestamp: "6.242000", v1: "c0202010", v2: "00000000", v3: "00000001", v4: "00000000", v5: "00000000", v6: "00000000", v7: "8000ad8a", v8: "00000000" }
 // The next line declares the Function Type. We can actually erase it, VSCode PureScript Extension will helpfully suggest it for us.
-var parseStackDump = /* #__PURE__ */ discard1(/* #__PURE__ */ $$void(/* #__PURE__ */ applyFirst(/* #__PURE__ */ StringParser_CodePoints.string("["))(StringParser_CodePoints.skipSpaces)))(function () {
-    return bind(applyFirst(applyFirst(StringParser_CodePoints.regex("[.0-9]+"))(StringParser_CodePoints.string("]")))(StringParser_CodePoints.skipSpaces))(function (timestamp) {
-        return discard1($$void(applyFirst(StringParser_CodePoints.string("stack_dump:"))(StringParser_CodePoints.skipSpaces)))(function () {
-            return discard1($$void(StringParser_CodePoints.string("0x")))(function () {
-                return bind(applyFirst(applyFirst(StringParser_CodePoints.regex("[0-9a-f]+"))(StringParser_CodePoints.string(":")))(StringParser_CodePoints.skipSpaces))(function (addr) {
-                    return bind(applyFirst(StringParser_CodePoints.regex("[0-9a-f]+"))(StringParser_CodePoints.skipSpaces))(function (v1) {
-                        return bind(applyFirst(StringParser_CodePoints.regex("[0-9a-f]+"))(StringParser_CodePoints.skipSpaces))(function (v2) {
-                            return bind(applyFirst(StringParser_CodePoints.regex("[0-9a-f]+"))(StringParser_CodePoints.skipSpaces))(function (v3) {
-                                return bind(applyFirst(StringParser_CodePoints.regex("[0-9a-f]+"))(StringParser_CodePoints.skipSpaces))(function (v4) {
-                                    return bind(applyFirst(StringParser_CodePoints.regex("[0-9a-f]+"))(StringParser_CodePoints.skipSpaces))(function (v5) {
-                                        return bind(applyFirst(StringParser_CodePoints.regex("[0-9a-f]+"))(StringParser_CodePoints.skipSpaces))(function (v6) {
-                                            return bind(applyFirst(StringParser_CodePoints.regex("[0-9a-f]+"))(StringParser_CodePoints.skipSpaces))(function (v7) {
-                                                return bind(applyFirst(StringParser_CodePoints.regex("[0-9a-f]+"))(StringParser_CodePoints.skipSpaces))(function (v8) {
-                                                    return pure({
-                                                        timestamp: timestamp,
-                                                        addr: addr,
-                                                        v1: v1,
-                                                        v2: v2,
-                                                        v3: v3,
-                                                        v4: v4,
-                                                        v5: v5,
-                                                        v6: v6,
-                                                        v7: v7,
-                                                        v8: v8
-                                                    });
-                                                });
+var parseStackDump = /* #__PURE__ */ discard1(/* #__PURE__ */ $$void(/* #__PURE__ */ applyFirst(/* #__PURE__ */ StringParser_CodePoints.string("stack_dump:"))(StringParser_CodePoints.skipSpaces)))(function () {
+    return discard1($$void(StringParser_CodePoints.string("0x")))(function () {
+        return bind(applyFirst(applyFirst(StringParser_CodePoints.regex("[0-9a-f]+"))(StringParser_CodePoints.string(":")))(StringParser_CodePoints.skipSpaces))(function (addr) {
+            return bind(applyFirst(StringParser_CodePoints.regex("[0-9a-f]+"))(StringParser_CodePoints.skipSpaces))(function (v1) {
+                return bind(applyFirst(StringParser_CodePoints.regex("[0-9a-f]+"))(StringParser_CodePoints.skipSpaces))(function (v2) {
+                    return bind(applyFirst(StringParser_CodePoints.regex("[0-9a-f]+"))(StringParser_CodePoints.skipSpaces))(function (v3) {
+                        return bind(applyFirst(StringParser_CodePoints.regex("[0-9a-f]+"))(StringParser_CodePoints.skipSpaces))(function (v4) {
+                            return bind(applyFirst(StringParser_CodePoints.regex("[0-9a-f]+"))(StringParser_CodePoints.skipSpaces))(function (v5) {
+                                return bind(applyFirst(StringParser_CodePoints.regex("[0-9a-f]+"))(StringParser_CodePoints.skipSpaces))(function (v6) {
+                                    return bind(applyFirst(StringParser_CodePoints.regex("[0-9a-f]+"))(StringParser_CodePoints.skipSpaces))(function (v7) {
+                                        return bind(applyFirst(StringParser_CodePoints.regex("[0-9a-f]+"))(StringParser_CodePoints.skipSpaces))(function (v8) {
+                                            return pure({
+                                                addr: addr,
+                                                v1: v1,
+                                                v2: v2,
+                                                v3: v3,
+                                                v4: v4,
+                                                v5: v5,
+                                                v6: v6,
+                                                v7: v7,
+                                                v8: v8
                                             });
                                         });
                                     });
@@ -265,7 +273,7 @@ var doUnParser = function (dictShow) {
                         if (v instanceof Data_Either.Right) {
                             return Effect_Console.log("Result: " + (show3(v.value0.result) + ("\x0aSuffix was: " + show2(v.value0.suffix))))();
                         };
-                        throw new Error("Failed pattern match at Main (line 399, column 3 - line 409, column 25): " + [ v.constructor.name ]);
+                        throw new Error("Failed pattern match at Main (line 398, column 3 - line 408, column 25): " + [ v.constructor.name ]);
                     })();
                     return Effect_Console.log("-----")();
                 };
@@ -292,7 +300,7 @@ var doRunParser = function (dictShow) {
                         if (v instanceof Data_Either.Right) {
                             return Effect_Console.log("Result: " + show3(v.value0))();
                         };
-                        throw new Error("Failed pattern match at Main (line 418, column 3 - line 420, column 52): " + [ v.constructor.name ]);
+                        throw new Error("Failed pattern match at Main (line 417, column 3 - line 419, column 52): " + [ v.constructor.name ]);
                     })();
                     return Effect_Console.log("-----")();
                 };
@@ -320,10 +328,6 @@ var doRunParser1 = /* #__PURE__ */ doRunParser(/* #__PURE__ */ showRecord(/* #__
 var doRunParser2 = /* #__PURE__ */ doRunParser(/* #__PURE__ */ showRecord(/* #__PURE__ */ Data_Show.showRecordFieldsCons({
     reflectSymbol: function () {
         return "addr";
-    }
-})(/* #__PURE__ */ Data_Show.showRecordFieldsCons({
-    reflectSymbol: function () {
-        return "timestamp";
     }
 })(/* #__PURE__ */ Data_Show.showRecordFieldsCons({
     reflectSymbol: function () {
@@ -357,7 +361,7 @@ var doRunParser2 = /* #__PURE__ */ doRunParser(/* #__PURE__ */ showRecord(/* #__
     reflectSymbol: function () {
         return "v8";
     }
-})(Data_Show.showString))(Data_Show.showString))(Data_Show.showString))(Data_Show.showString))(Data_Show.showString))(Data_Show.showString))(Data_Show.showString))(Data_Show.showString))(Data_Show.showString))(Data_Show.showString)));
+})(Data_Show.showString))(Data_Show.showString))(Data_Show.showString))(Data_Show.showString))(Data_Show.showString))(Data_Show.showString))(Data_Show.showString))(Data_Show.showString))(Data_Show.showString)));
 
 // Parse the NuttX Exception and NuttX Stack Dump. Explain the NuttX Exception.
 // `Effect` says that it will do Side Effects (printing to console)
@@ -368,7 +372,7 @@ var printResults = function __do() {
     Effect_Console.log(explainException(13)("epc")("mtval"))();
     Effect_Console.log(explainException(0)("epc")("mtval"))();
     doRunParser1("parseException")(parseException)("riscv_exception: EXCEPTION: Instruction page fault. MCAUSE: 000000000000000c, EPC: 000000008000ad8a, MTVAL: 000000008000ad8a")();
-    return doRunParser2("parseStackDump")(parseStackDump)("[    6.242000] stack_dump: 0xc02027e0: c0202010 00000000 00000001 00000000 00000000 00000000 8000ad8a 00000000")();
+    return doRunParser2("parseStackDump")(parseStackDump)("stack_dump: 0xc02027e0: c0202010 00000000 00000001 00000000 00000000 00000000 8000ad8a 00000000")();
 };
 
 // Main Function that will run our Test Code.
