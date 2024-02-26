@@ -32,6 +32,7 @@ printResults = do
   -- Explain the NuttX Exception.
   -- `$ something something` is shortcut for `( something something )`
   log $ explainException 12 "epc" "mtval"
+  log $ explainException 13 "epc" "mtval"
   log $ explainException 0 "epc" "mtval"
 
   -- Parse the NuttX Exception
@@ -50,6 +51,10 @@ explainException ∷ Int → String → String → String
 -- Explain the NuttX Exception with mcause 12
 explainException 12 epc mtval =
   "Instruction Page Fault at " <> epc <> ", " <> mtval
+
+-- Explain the NuttX Exception with mcause 13
+explainException 13 epc mtval =
+  "Load Page Fault at " <> epc <> ", " <> mtval
 
 -- Explain the Other NuttX Exceptions, that are not matched with the above
 explainException mcause epc mtval =

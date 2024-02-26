@@ -210,6 +210,9 @@ var explainException = function (v) {
             if (v === 12) {
                 return "Instruction Page Fault at " + (v1 + (", " + v2));
             };
+            if (v === 13) {
+                return "Load Page Fault at " + (v1 + (", " + v2));
+            };
             return "Unknown Exception: mcause=" + (show(v) + (", epc=" + (v1 + (", mtval=" + v2))));
         };
     };
@@ -262,7 +265,7 @@ var doUnParser = function (dictShow) {
                         if (v instanceof Data_Either.Right) {
                             return Effect_Console.log("Result: " + (show3(v.value0.result) + ("\x0aSuffix was: " + show2(v.value0.suffix))))();
                         };
-                        throw new Error("Failed pattern match at Main (line 394, column 3 - line 404, column 25): " + [ v.constructor.name ]);
+                        throw new Error("Failed pattern match at Main (line 399, column 3 - line 409, column 25): " + [ v.constructor.name ]);
                     })();
                     return Effect_Console.log("-----")();
                 };
@@ -289,7 +292,7 @@ var doRunParser = function (dictShow) {
                         if (v instanceof Data_Either.Right) {
                             return Effect_Console.log("Result: " + show3(v.value0))();
                         };
-                        throw new Error("Failed pattern match at Main (line 413, column 3 - line 415, column 52): " + [ v.constructor.name ]);
+                        throw new Error("Failed pattern match at Main (line 418, column 3 - line 420, column 52): " + [ v.constructor.name ]);
                     })();
                     return Effect_Console.log("-----")();
                 };
@@ -362,6 +365,7 @@ var doRunParser2 = /* #__PURE__ */ doRunParser(/* #__PURE__ */ showRecord(/* #__
 // The next line declares the Function Type. We can actually erase it, VSCode PureScript Extension will helpfully suggest it for us.
 var printResults = function __do() {
     Effect_Console.log(explainException(12)("epc")("mtval"))();
+    Effect_Console.log(explainException(13)("epc")("mtval"))();
     Effect_Console.log(explainException(0)("epc")("mtval"))();
     doRunParser1("parseException")(parseException)("riscv_exception: EXCEPTION: Instruction page fault. MCAUSE: 000000000000000c, EPC: 000000008000ad8a, MTVAL: 000000008000ad8a")();
     return doRunParser2("parseStackDump")(parseStackDump)("[    6.242000] stack_dump: 0xc02027e0: c0202010 00000000 00000001 00000000 00000000 00000000 8000ad8a 00000000")();
