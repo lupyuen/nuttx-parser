@@ -468,11 +468,15 @@ And it works correctly yay!
 
 Try it here: https://lupyuen.github.io/nuttx-tinyemu/purescript
 
+[(Watch the Demo on YouTube)](https://youtu.be/SpmG8afOsd8)
+
 # Lookup Addresses in NuttX Disassembly
 
 _Given an Exception Address like 8000ad8a, can we show the NuttX Disassembly?_
 
 TODO: Need to chunk nuttx.S by address: nuttx-8000ad90.S, nuttx-8000ae00.S, nuttx-8000b000.S, nuttx-80010000.S
+
+TODO: Link to NuttX Repo Source Code
 
 # PureScript Editor for NuttX
 
