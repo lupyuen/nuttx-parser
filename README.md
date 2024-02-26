@@ -144,7 +144,7 @@ Result: {
 
 Not that hard! We could have refactored the code to make it shorter. But we'll keep it long because it's easier to read.
 
-Works OK in JavaScript too: [test.html](test.html)
+Works OK in JavaScript too: [index.html](index.html)
 
 ```javascript
 // Run parseStackDump
@@ -264,7 +264,7 @@ parseException = do
     }
 ```
 
-We can run it in Web Browser JavaScript: [test.html](test.html)
+We can run it in Web Browser JavaScript: [index.html](index.html)
 
 ```javascript
   // Run parseException
@@ -315,7 +315,7 @@ explainException mcause epc mtval =
   "Unknown Exception: mcause=" <> show mcause <> ", epc=" <> epc <> ", mtval=" <> mtval
 ```
 
-We can run it in Web Browser JavaScript: [test.html](test.html)
+We can run it in Web Browser JavaScript: [index.html](index.html)
 
 ```javascript
   // Run explainException
@@ -512,7 +512,7 @@ Suffix was: { position: 110, substring: "" }
 
 # Run parseCSV in Web Browser
 
-Here's how we run [parseCSV](src/Main.purs) in the Web Browser: [test.html](test.html)
+Here's how we run [parseCSV](src/Main.purs) in the Web Browser: [index.html](index.html)
 
 ```javascript
   // Import Main Module
@@ -547,7 +547,7 @@ Output:
 
 TODO: Change `exampleContent2` to parse our [NuttX Log](https://gist.github.com/lupyuen/a715e4e77c011d610d0b418e97f8bf5d)
 
-We expose the PureScript Functions in the Web Browser: [test.html](test.html)
+We expose the PureScript Functions in the Web Browser: [index.html](index.html)
 
 ```javascript
 // Import Main Module
