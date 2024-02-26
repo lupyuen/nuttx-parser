@@ -400,6 +400,74 @@ After rewriting the JavaScript Imports, we may now call PureScript from NuttX Em
 
 Try it here: https://lupyuen.github.io/nuttx-tinyemu/purescript
 
+# Parse NuttX Logs in NuttX Emulator
+
+This is how we parse every line of Terminal Output from NuttX Emulator: [term.js](https://github.com/lupyuen/nuttx-tinyemu/blob/main/docs/purescript/term.js#L1483-L1527)
+
+```javascript
+// When TinyEMU prints to the Terminal Output...
+Term.prototype.write = function(str) {
+    // Parse the output with PureScript
+    parseLog(str);
+    ...
+}
+
+// Parse NuttX Logs with PureScript.
+// Assume `str` is a single character for Terminal Output. We accumulate the characters and parse the line.
+// PureScript Parser is inited in `index.html`
+function parseLog(str) {
+
+    // Accumulate the characters into a line
+    if (!window.StringParser_Parser) { return; }
+    termbuf += str;
+    if (termbuf.indexOf("\r") < 0) { return; }
+
+    // Ignore all Newlines and Carriage Returns
+    termbuf = termbuf
+        .split("\r").join("")
+        .split("\n").join("");
+    // console.log({termbuf});
+
+    // Parse the Exception
+    const exception = StringParser_Parser
+        .runParser(parseException)(termbuf)
+        .value0;
+
+    // Explain the Exception
+    if (exception.error === undefined) {
+        console.log({exception});
+        const explain = explainException(exception.mcause)(exception.epc)(exception.mtval);
+        console.log({explain});
+    }
+
+    // Run parseStackDump
+    const stackDump = StringParser_Parser
+        .runParser(parseStackDump)(termbuf)
+        .value0;
+    if (stackDump.error === undefined) { console.log({stackDump}); }
+
+    // Reset the Line Buffer
+    termbuf = "";
+}
+
+// Buffer the last line of the Terminal Output
+let termbuf = "";
+```
+
+And it works correctly yay!
+
+```text
+"exception": {
+    "exception": "Load page fault",
+    "mcause": 13,
+    "epc": "000000008000a0e4",
+    "mtval": "0000000880203b88"
+}
+"explain": "Load Page Fault at 000000008000a0e4, 0000000880203b88"
+```
+
+Try it here: https://lupyuen.github.io/nuttx-tinyemu/purescript
+
 # Lookup Addresses in NuttX Disassembly
 
 _Given an Exception Address like 8000ad8a, can we show the NuttX Disassembly?_
