@@ -28,6 +28,8 @@ Right now our NuttX Logs are accessible in a Web Browser through JavaScript: Nut
 
 PureScript is probably easier to run in a Web Browser for processing the JavaScript Logs.
 
+[(Zephyr Stack Dumps are also complicated)](https://github.com/zephyrproject-rtos/zephyr/issues/4416)
+
 # Parse NuttX Stack Dump with PureScript
 
 Let's parse the [NuttX Stack Dump](https://gist.github.com/lupyuen/a715e4e77c011d610d0b418e97f8bf5d#file-nuttx-tcc-app-log-L168-L224)...
