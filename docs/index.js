@@ -31,6 +31,7 @@ var discard = /* #__PURE__ */ Control_Bind.discard(Control_Bind.discardUnit);
 var discard1 = /* #__PURE__ */ discard(StringParser_Parser.bindParser);
 
 // To parse the line: `stack_dump: 0xc02027e0: c0202010 00000000 00000001 00000000 00000000 00000000 8000ad8a 00000000`
+// If the line begins with a Timestamp: `[    6.242000] `
 // Skip `[    `
 // `void` means ignore the Text Captured
 // `$ something something` is shortcut for `( something something )`
@@ -38,12 +39,9 @@ var discard1 = /* #__PURE__ */ discard(StringParser_Parser.bindParser);
 // void $
 //   string "["    -- Match the string `[`
 //   <* skipSpaces -- Skip the following spaces
-// -- `timestamp` becomes `6.242000`
-// -- `<*` says when we should stop the Text Capture
-// timestamp <-
-//   regex "[.0-9]+" 
-//   <* string "]" 
-//   <* skipSpaces
+//   <* regex "[.0-9]+" -- Skip the number
+//   <* string "]" -- Match the string `]`
+//   <* skipSpaces -- Skip the following spaces
 // Skip `stack_dump: `
 // `void` means ignore the Text Captured
 // `$ something something` is shortcut for `( something something )`
@@ -209,6 +207,9 @@ var numberOfAs = /* #__PURE__ */ bind(/* #__PURE__ */ StringParser_Combinators.m
 });
 var extractWords = /* #__PURE__ */ StringParser_Combinators.endBy1(/* #__PURE__ */ StringParser_CodePoints.regex("[a-zA-Z]+"))(/* #__PURE__ */ StringParser_Combinators.many1(/* #__PURE__ */ alt(/* #__PURE__ */ StringParser_Combinators.withError(/* #__PURE__ */ StringParser_CodePoints.string(" "))("Failed to match space as a separator"))(/* #__PURE__ */ alt(/* #__PURE__ */ StringParser_Combinators.withError(/* #__PURE__ */ StringParser_CodePoints.string("'"))("Failed to match single-quote char as a separator"))(/* #__PURE__ */ alt(/* #__PURE__ */ StringParser_Combinators.withError(/* #__PURE__ */ StringParser_CodePoints.string(","))("Failed to match comma as a separator"))(/* #__PURE__ */ alt(/* #__PURE__ */ StringParser_Combinators.withError(/* #__PURE__ */ StringParser_CodePoints.string("?"))("Failed to match question mark as a separator"))(/* #__PURE__ */ StringParser_Combinators.withError(/* #__PURE__ */ StringParser_Combinators.withError(/* #__PURE__ */ StringParser_CodePoints.string("."))("Failed to match period as a separator"))("Could not find a character that separated the content...")))))));
 
+// Parse the line of NuttX Stack Dump with Timestamp
+// doRunParser "parseStackDump" parseStackDump
+//   "[    6.242000] stack_dump: 0xc02027e0: c0202010 00000000 00000001 00000000 00000000 00000000 8000ad8a 00000000"
 // Given this NuttX Exception: `riscv_exception: EXCEPTION: Instruction page fault. MCAUSE: 000000000000000c, EPC: 000000008000ad8a, MTVAL: 000000008000ad8a`
 // Explain in friendly words: "NuttX stopped because it tried to read or write an Invalid Address. The Invalid Address is 8000ad8a. The code that caused this is at 8000ad8a. Check the NuttX Disassembly for the Source Code of the crashing line."
 // The next line declares the Function Type. We can actually erase it, VSCode PureScript Extension will helpfully suggest it for us.
@@ -273,7 +274,7 @@ var doUnParser = function (dictShow) {
                         if (v instanceof Data_Either.Right) {
                             return Effect_Console.log("Result: " + (show3(v.value0.result) + ("\x0aSuffix was: " + show2(v.value0.suffix))))();
                         };
-                        throw new Error("Failed pattern match at Main (line 398, column 3 - line 408, column 25): " + [ v.constructor.name ]);
+                        throw new Error("Failed pattern match at Main (line 400, column 3 - line 410, column 25): " + [ v.constructor.name ]);
                     })();
                     return Effect_Console.log("-----")();
                 };
@@ -300,7 +301,7 @@ var doRunParser = function (dictShow) {
                         if (v instanceof Data_Either.Right) {
                             return Effect_Console.log("Result: " + show3(v.value0))();
                         };
-                        throw new Error("Failed pattern match at Main (line 417, column 3 - line 419, column 52): " + [ v.constructor.name ]);
+                        throw new Error("Failed pattern match at Main (line 419, column 3 - line 421, column 52): " + [ v.constructor.name ]);
                     })();
                     return Effect_Console.log("-----")();
                 };

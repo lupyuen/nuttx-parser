@@ -43,6 +43,10 @@ printResults = do
   doRunParser "parseStackDump" parseStackDump
     "stack_dump: 0xc02027e0: c0202010 00000000 00000001 00000000 00000000 00000000 8000ad8a 00000000"
 
+  -- Parse the line of NuttX Stack Dump with Timestamp
+  -- doRunParser "parseStackDump" parseStackDump
+  --   "[    6.242000] stack_dump: 0xc02027e0: c0202010 00000000 00000001 00000000 00000000 00000000 8000ad8a 00000000"
+
 -- Given this NuttX Exception: `riscv_exception: EXCEPTION: Instruction page fault. MCAUSE: 000000000000000c, EPC: 000000008000ad8a, MTVAL: 000000008000ad8a`
 -- Explain in friendly words: "NuttX stopped because it tried to read or write an Invalid Address. The Invalid Address is 8000ad8a. The code that caused this is at 8000ad8a. Check the NuttX Disassembly for the Source Code of the crashing line."
 -- The next line declares the Function Type. We can actually erase it, VSCode PureScript Extension will helpfully suggest it for us.
@@ -123,6 +127,8 @@ parseStackDump ∷ Parser { addr ∷ String , v1 ∷ String , v2 ∷ String , v3
 parseStackDump = do
 
   -- To parse the line: `stack_dump: 0xc02027e0: c0202010 00000000 00000001 00000000 00000000 00000000 8000ad8a 00000000`
+
+  -- If the line begins with a Timestamp: `[    6.242000] `
   -- Skip `[    `
   -- `void` means ignore the Text Captured
   -- `$ something something` is shortcut for `( something something )`
@@ -130,13 +136,9 @@ parseStackDump = do
   -- void $
   --   string "["    -- Match the string `[`
   --   <* skipSpaces -- Skip the following spaces
-
-  -- -- `timestamp` becomes `6.242000`
-  -- -- `<*` says when we should stop the Text Capture
-  -- timestamp <-
-  --   regex "[.0-9]+" 
-  --   <* string "]" 
-  --   <* skipSpaces
+  --   <* regex "[.0-9]+" -- Skip the number
+  --   <* string "]" -- Match the string `]`
+  --   <* skipSpaces -- Skip the following spaces
 
   -- Skip `stack_dump: `
   -- `void` means ignore the Text Captured

@@ -552,6 +552,8 @@ var voidRight = /* #__PURE__ */ Data_Functor.voidRight(StringParser_Parser.funct
 
 TODO: Where is Main Function?
 
+TODO: Copy Generated JavaScript to NuttX Emulator
+
 # BigInt in PureScript
 
 _Why are we passing addresses in Text instead of Numbers? Like `8000ad8a`_
