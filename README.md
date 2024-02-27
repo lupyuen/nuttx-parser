@@ -484,6 +484,8 @@ Code Addresses are at 0x8000_0000 to 0x8006_4a28
 
 Spanning 277K lines of code!
 
+NuttX Disassembly Chunker: https://github.com/lupyuen/nuttx-disassembly-chunker/blob/main/src/main.rs
+
 # PureScript Editor for NuttX
 
 To run our PureScript Editor for NuttX...
