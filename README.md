@@ -474,9 +474,15 @@ Try it here: https://lupyuen.github.io/nuttx-tinyemu/purescript
 
 _Given an Exception Address like 8000ad8a, can we show the NuttX Disassembly?_
 
-TODO: Need to chunk nuttx.S by address: nuttx-8000ad90.S, nuttx-8000ae00.S, nuttx-8000b000.S, nuttx-80010000.S
+TODO: Need to chunk nuttx.S (or qjs.S) by address: nuttx-8000ad90.S, nuttx-8000ae00.S, nuttx-8000b000.S, nuttx-80010000.S
 
 TODO: Link to NuttX Repo Source Code
+
+Let's chunk qjs.S: https://github.com/lupyuen/nuttx-tinyemu/blob/main/docs/purescript/qjs.S
+
+Code Addresses are at 0x8000_0000 to 0x8006_4a28
+
+Spanning 277K lines of code!
 
 # PureScript Editor for NuttX
 
