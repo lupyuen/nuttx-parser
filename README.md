@@ -1,3 +1,9 @@
+![Parsing Apache NuttX RTOS Logs with PureScript](https://lupyuen.github.io/images/purescript-parse.png)
+
+[(Try the Online Demo)](https://lupyuen.github.io/nuttx-tinyemu/purescript)
+
+[(Watch the Demo on YouTube)](https://youtu.be/SpmG8afOsd8)
+
 # Parsing Apache NuttX RTOS Logs with PureScript
 
 In the Web Browser, we can get Real-Time Logs from NuttX Devices (Web Serial API) NuttX Emulator (Term.js)...
@@ -469,6 +475,8 @@ And it works correctly yay!
 Try it here: https://lupyuen.github.io/nuttx-tinyemu/purescript
 
 [(Watch the Demo on YouTube)](https://youtu.be/SpmG8afOsd8)
+
+![Parsing Apache NuttX RTOS Logs with PureScript](https://lupyuen.github.io/images/purescript-parse.png)
 
 # Lookup Addresses in NuttX Disassembly
 
