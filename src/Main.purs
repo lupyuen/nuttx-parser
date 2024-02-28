@@ -7,7 +7,7 @@ import Prelude hiding (between)
 
 import Data.Either (Either(..))
 import Data.Int (fromStringAs, hexadecimal)
-import Data.Maybe (fromMaybe)
+import Data.Maybe (Maybe(..), fromMaybe)
 import Effect (Effect)
 import Effect.Console (log, logShow)
 import StringParser (Parser, regex, runParser, skipSpaces, string)
@@ -35,6 +35,13 @@ explainException 13 epc mtval =
 -- Explain the Other NuttX Exceptions, that are not matched with the above
 explainException mcause epc mtval =
   "Unknown Exception: mcause=" <> show mcause <> ", epc=" <> epc <> ", mtval=" <> mtval
+
+identifyAddress ∷ String → Maybe { mod ∷ String , type ∷ String }
+identifyAddress _ = Just
+  {
+    mod: "aaaa"
+  , type: "bbbb"
+  }
 
 -- Parse the NuttX Exception and NuttX Stack Dump. Explain the NuttX Exception.
 -- `Effect` says that it will do Side Effects (printing to console)

@@ -113,6 +113,12 @@ var parseException = /* #__PURE__ */ discard1(/* #__PURE__ */ $$void(/* #__PURE_
         });
     });
 });
+var identifyAddress = function (v) {
+    return new Data_Maybe.Just({
+        mod: "aaaa",
+        type: "bbbb"
+    });
+};
 
 // Given this NuttX Exception: `riscv_exception: EXCEPTION: Instruction page fault. MCAUSE: 000000000000000c, EPC: 000000008000ad8a, MTVAL: 000000008000ad8a`
 // Explain in friendly words: "NuttX stopped because it tried to read or write an Invalid Address. The Invalid Address is 8000ad8a. The code that caused this is at 8000ad8a. Check the NuttX Disassembly for the Source Code of the crashing line."
@@ -149,7 +155,7 @@ var doRunParser = function (dictShow) {
                         if (v instanceof Data_Either.Right) {
                             return Effect_Console.log("Result: " + show1(v.value0))();
                         };
-                        throw new Error("Failed pattern match at Main (line 181, column 3 - line 183, column 52): " + [ v.constructor.name ]);
+                        throw new Error("Failed pattern match at Main (line 188, column 3 - line 190, column 52): " + [ v.constructor.name ]);
                     })();
                     return Effect_Console.log("-----")();
                 };
@@ -232,6 +238,7 @@ var main = printResults;
 export {
     main,
     explainException,
+    identifyAddress,
     printResults,
     parseException,
     parseStackDump,
