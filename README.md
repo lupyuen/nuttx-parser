@@ -1,8 +1,8 @@
-![Parsing Apache NuttX RTOS Logs with PureScript](https://lupyuen.github.io/images/purescript-parse.png)
+![Parsing Apache NuttX RTOS Logs with PureScript](https://lupyuen.github.io/images/purescript-parse2.png)
 
 [(Try the Online Demo)](https://lupyuen.github.io/nuttx-tinyemu/purescript)
 
-[(Watch the Demo on YouTube)](https://youtu.be/SpmG8afOsd8)
+[(Watch the Demo on YouTube)](https://youtu.be/9oBhy3P7pYc)
 
 # Parsing Apache NuttX RTOS Logs with PureScript
 
@@ -474,9 +474,9 @@ And it works correctly yay!
 
 Try it here: https://lupyuen.github.io/nuttx-tinyemu/purescript
 
-[(Watch the Demo on YouTube)](https://youtu.be/SpmG8afOsd8)
+[(Watch the Demo on YouTube)](https://youtu.be/9oBhy3P7pYc)
 
-![Parsing Apache NuttX RTOS Logs with PureScript](https://lupyuen.github.io/images/purescript-parse.png)
+![Parsing Apache NuttX RTOS Logs with PureScript](https://lupyuen.github.io/images/purescript-parse2.png)
 
 # Show NuttX Disassembly by Address
 
