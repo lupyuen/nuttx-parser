@@ -3,7 +3,7 @@
 </body>
 <script type=module>
   // Import Main Module
-  import { main, doRunParser, parseException, parseStackDump, explainException } from './index.js';
+  import { main, doRunParser, parseException, parseStackDump, explainException, identifyAddress } from './index.js';
   import * as StringParser_Parser from "https://compile.purescript.org/output/StringParser.Parser/index.js";
 
   // For Testing: Export the PureScript Functions
@@ -13,6 +13,7 @@
   window.parseException = parseException;
   window.parseStackDump = parseStackDump;
   window.explainException = explainException;
+  window.identifyAddress = identifyAddress;
 
   // Run parseException
   console.log('Running parseException...');
@@ -41,6 +42,16 @@
   console.log({result3});
   window.result3 = result3;
 
+  // Run identifyAddress
+  console.log('Running identifyAddress...');
+  const result4 = identifyAddress('502198ac')
+  console.log({result4});
+  window.result4 = result4;
+
+  const result5 = identifyAddress('80064a28')
+  console.log({result5});
+  window.result5 = result5;
+  
   // Run Main Function
   // console.log('Running main...');
   // main();

@@ -7,7 +7,7 @@ import Prelude hiding (between)
 
 import Data.Either (Either(..))
 import Data.Int (fromStringAs, hexadecimal)
-import Data.Maybe (Maybe(..), fromJust, fromMaybe, isJust)
+import Data.Maybe (Maybe(..), fromMaybe, isJust)
 import Data.String.Regex (match)
 import Data.String.Regex.Flags (noFlags)
 import Data.String.Regex.Unsafe (unsafeRegex)
