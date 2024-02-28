@@ -8,6 +8,8 @@ import Prelude hiding (between)
 import Data.Either (Either(..))
 import Data.Int (fromStringAs, hexadecimal)
 import Data.Maybe (Maybe(..), fromMaybe, isJust)
+import Data.String (stripPrefix)
+import Data.String.Pattern (Pattern(..))
 import Data.String.Regex (match)
 import Data.String.Regex.Flags (noFlags)
 import Data.String.Regex.Unsafe (unsafeRegex)
@@ -55,11 +57,17 @@ instance Show AddressType where
   show Code = "Code"
   show Data = "Data"
 
--- Return True if the Address matches the Regex Pattern
+-- Return True if the Address matches the Regex Pattern.
+-- Pattern is assumed to match the Entire Address.
 matches ∷ String → String → Boolean
 
-matches pattern addr = isJust $ 
-  (unsafeRegex pattern noFlags) `match` addr
+matches pattern addr = 
+  let 
+    patternWrap = "^" <> pattern <> "$"
+  in
+    isJust $ 
+      patternWrap `unsafeRegex` noFlags
+        `match` addr
 
 -- Parse the NuttX Exception and NuttX Stack Dump. Explain the NuttX Exception.
 -- `Effect` says that it will do Side Effects (printing to console)
@@ -72,6 +80,7 @@ printResults = do
   -- NuttX App (qjs): 0x8000_0000 to 0x8006_4a28
   logShow $ identifyAddress "502198ac"
   logShow $ identifyAddress "80064a28"
+  logShow $ identifyAddress "0000000800203b88"
 
   -- Explain the NuttX Exception.
   -- `$ something something` is shortcut for `( something something )`
@@ -93,7 +102,7 @@ printResults = do
 
 -- Parse the NuttX Exception.
 -- Given this NuttX Exception: `riscv_exception: EXCEPTION: Instruction page fault. MCAUSE: 000000000000000c, EPC: 000000008000ad8a, MTVAL: 000000008000ad8a`
--- Result: { epc: "000000008000ad8a", exception: "Instruction page fault", mcause: 12, mtval: "000000008000ad8a" }
+-- Result: { epc: "8000ad8a", exception: "Instruction page fault", mcause: 12, mtval: "8000ad8a" }
 -- The next line declares the Function Type. We can actually erase it, VSCode PureScript Extension will helpfully suggest it for us.
 parseException ∷ Parser { exception ∷ String, mcause :: Int, epc :: String, mtval :: String }
 parseException = do
@@ -126,24 +135,33 @@ parseException = do
   mcauseStr <- regex "[0-9a-f]+" <* string "," <* skipSpaces
 
   -- Skip `EPC: `
-  -- `epc` becomes `000000008000ad8a`
+  -- `epcWithPrefix` becomes `000000008000ad8a`
+  -- We'll strip the prefix `00000000` later
   void $ string "EPC:" <* skipSpaces
-  epc <- regex "[0-9a-f]+" <* string "," <* skipSpaces
+  epcWithPrefix <- regex "[0-9a-f]+" <* string "," <* skipSpaces
 
   -- Skip `MTVAL: `
-  -- `mtval` becomes `000000008000ad8a`
+  -- `mtvalWithPrefix` becomes `000000008000ad8a`
+  -- We'll strip the prefix `00000000` later
   void $ string "MTVAL:" <* skipSpaces
-  mtval <- regex "[0-9a-f]+"
+  mtvalWithPrefix <- regex "[0-9a-f]+"
 
   -- Return the parsed content
   -- `pure` because we're in a `do` block that allows (Side) Effects
   pure 
     {
       exception
-    , mcause: -1 `fromMaybe`               -- If `mcauseStr` is not a valid hex, return -1
+    , mcause:
+        -1 `fromMaybe` -- If `mcauseStr` is not a valid hex, return -1
         fromStringAs hexadecimal mcauseStr -- Else return the hex value of `mcauseStr`
-    , epc
-    , mtval
+
+    , epc:
+        epcWithPrefix `fromMaybe` -- If `epcWithPrefix` does not have prefix `00000000`, return it
+        stripPrefix (Pattern "00000000") epcWithPrefix -- Else strip prefix `00000000` from `epc`
+
+    , mtval:
+        mtvalWithPrefix `fromMaybe` -- If `mtvalWithPrefix` does not have prefix `00000000`, return it
+        stripPrefix (Pattern "00000000") mtvalWithPrefix -- Else strip prefix `00000000` from `mtval`
     }
 
 -- Parse a line of NuttX Stack Dump.

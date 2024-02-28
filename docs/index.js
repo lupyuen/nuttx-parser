@@ -9,6 +9,7 @@ import * as Data_Functor from "https://compile.purescript.org/output/Data.Functo
 import * as Data_Int from "https://compile.purescript.org/output/Data.Int/index.js";
 import * as Data_Maybe from "https://compile.purescript.org/output/Data.Maybe/index.js";
 import * as Data_Show from "https://compile.purescript.org/output/Data.Show/index.js";
+import * as Data_String_CodeUnits from "https://compile.purescript.org/output/Data.String.CodeUnits/index.js";
 import * as Data_String_Regex from "https://compile.purescript.org/output/Data.String.Regex/index.js";
 import * as Data_String_Regex_Flags from "https://compile.purescript.org/output/Data.String.Regex.Flags/index.js";
 import * as Data_String_Regex_Unsafe from "https://compile.purescript.org/output/Data.String.Regex.Unsafe/index.js";
@@ -77,7 +78,7 @@ var showAddressType = {
         if (v instanceof Data) {
             return "Data";
         };
-        throw new Error("Failed pattern match at Main (line 54, column 1 - line 56, column 21): " + [ v.constructor.name ]);
+        throw new Error("Failed pattern match at Main (line 56, column 1 - line 58, column 21): " + [ v.constructor.name ]);
     }
 };
 
@@ -143,14 +144,14 @@ var parseException = /* #__PURE__ */ discard1(/* #__PURE__ */ $$void(/* #__PURE_
         return discard1($$void(applyFirst(StringParser_CodePoints.string("MCAUSE:"))(StringParser_CodePoints.skipSpaces)))(function () {
             return bind(applyFirst(applyFirst(StringParser_CodePoints.regex("[0-9a-f]+"))(StringParser_CodePoints.string(",")))(StringParser_CodePoints.skipSpaces))(function (mcauseStr) {
                 return discard1($$void(applyFirst(StringParser_CodePoints.string("EPC:"))(StringParser_CodePoints.skipSpaces)))(function () {
-                    return bind(applyFirst(applyFirst(StringParser_CodePoints.regex("[0-9a-f]+"))(StringParser_CodePoints.string(",")))(StringParser_CodePoints.skipSpaces))(function (epc) {
+                    return bind(applyFirst(applyFirst(StringParser_CodePoints.regex("[0-9a-f]+"))(StringParser_CodePoints.string(",")))(StringParser_CodePoints.skipSpaces))(function (epcWithPrefix) {
                         return discard1($$void(applyFirst(StringParser_CodePoints.string("MTVAL:"))(StringParser_CodePoints.skipSpaces)))(function () {
-                            return bind(StringParser_CodePoints.regex("[0-9a-f]+"))(function (mtval) {
+                            return bind(StringParser_CodePoints.regex("[0-9a-f]+"))(function (mtvalWithPrefix) {
                                 return pure({
                                     exception: exception,
                                     mcause: Data_Maybe.fromMaybe(-1 | 0)(Data_Int.fromStringAs(Data_Int.hexadecimal)(mcauseStr)),
-                                    epc: epc,
-                                    mtval: mtval
+                                    epc: Data_Maybe.fromMaybe(epcWithPrefix)(Data_String_CodeUnits.stripPrefix("00000000")(epcWithPrefix)),
+                                    mtval: Data_Maybe.fromMaybe(mtvalWithPrefix)(Data_String_CodeUnits.stripPrefix("00000000")(mtvalWithPrefix))
                                 });
                             });
                         });
@@ -161,10 +162,12 @@ var parseException = /* #__PURE__ */ discard1(/* #__PURE__ */ $$void(/* #__PURE_
     });
 });
 
-// Return True if the Address matches the Regex Pattern
+// Return True if the Address matches the Regex Pattern.
+// Pattern is assumed to match the Entire Address.
 var matches = function (pattern) {
     return function (addr) {
-        return Data_Maybe.isJust(Data_String_Regex.match(Data_String_Regex_Unsafe.unsafeRegex(pattern)(Data_String_Regex_Flags.noFlags))(addr));
+        var patternWrap = "^" + (pattern + "$");
+        return Data_Maybe.isJust(Data_String_Regex.match(Data_String_Regex_Unsafe.unsafeRegex(patternWrap)(Data_String_Regex_Flags.noFlags))(addr));
     };
 };
 
@@ -185,7 +188,7 @@ var identifyAddress = function (addr) {
     if (Data_Boolean.otherwise) {
         return Data_Maybe.Nothing.value;
     };
-    throw new Error("Failed pattern match at Main (line 43, column 1 - line 43, column 74): " + [ addr.constructor.name ]);
+    throw new Error("Failed pattern match at Main (line 45, column 1 - line 45, column 74): " + [ addr.constructor.name ]);
 };
 
 // Given this NuttX Exception: `riscv_exception: EXCEPTION: Instruction page fault. MCAUSE: 000000000000000c, EPC: 000000008000ad8a, MTVAL: 000000008000ad8a`
@@ -223,7 +226,7 @@ var doRunParser = function (dictShow) {
                         if (v instanceof Data_Either.Right) {
                             return Effect_Console.log("Result: " + show1(v.value0))();
                         };
-                        throw new Error("Failed pattern match at Main (line 211, column 3 - line 213, column 52): " + [ v.constructor.name ]);
+                        throw new Error("Failed pattern match at Main (line 229, column 3 - line 231, column 52): " + [ v.constructor.name ]);
                     })();
                     return Effect_Console.log("-----")();
                 };
@@ -293,6 +296,7 @@ var doRunParser2 = /* #__PURE__ */ doRunParser(/* #__PURE__ */ showRecord(/* #__
 var printResults = function __do() {
     logShow1(identifyAddress("502198ac"))();
     logShow1(identifyAddress("80064a28"))();
+    logShow1(identifyAddress("0000000800203b88"))();
     Effect_Console.log(explainException(12)("epc")("mtval"))();
     Effect_Console.log(explainException(13)("epc")("mtval"))();
     Effect_Console.log(explainException(0)("epc")("mtval"))();
