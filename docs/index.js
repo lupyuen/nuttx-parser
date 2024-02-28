@@ -126,8 +126,13 @@ var parseException = /* #__PURE__ */ discard1(/* #__PURE__ */ $$void(/* #__PURE_
         });
     });
 });
+var matchAddress = function (pattern) {
+    return function (addr) {
+        return Data_Maybe.isJust(Data_String_Regex.match(Data_String_Regex_Unsafe.unsafeRegex(pattern)(Data_String_Regex_Flags.noFlags))(addr));
+    };
+};
 var identifyAddress = function (s) {
-    if (Data_Maybe.isJust(Data_String_Regex.match(Data_String_Regex_Unsafe.unsafeRegex("a")(Data_String_Regex_Flags.noFlags))(s))) {
+    if (matchAddress("a")(s)) {
         return new Data_Maybe.Just({
             origin: "a",
             type: "b"
@@ -174,7 +179,7 @@ var doRunParser = function (dictShow) {
                         if (v instanceof Data_Either.Right) {
                             return Effect_Console.log("Result: " + show1(v.value0))();
                         };
-                        throw new Error("Failed pattern match at Main (line 198, column 3 - line 200, column 52): " + [ v.constructor.name ]);
+                        throw new Error("Failed pattern match at Main (line 197, column 3 - line 199, column 52): " + [ v.constructor.name ]);
                     })();
                     return Effect_Console.log("-----")();
                 };
@@ -237,11 +242,6 @@ var doRunParser2 = /* #__PURE__ */ doRunParser(/* #__PURE__ */ showRecord(/* #__
     }
 })(Data_Show.showString))(Data_Show.showString))(Data_Show.showString))(Data_Show.showString))(Data_Show.showString))(Data_Show.showString))(Data_Show.showString))(Data_Show.showString))(Data_Show.showString)));
 
-// identifyAddress _ = Just
-//   {
-//     origin: "aaaa"
-//   , type: "bbbb"
-//   }
 // Parse the NuttX Exception and NuttX Stack Dump. Explain the NuttX Exception.
 // `Effect` says that it will do Side Effects (printing to console)
 // `Unit` means that no value will be returned
@@ -265,6 +265,7 @@ export {
     main,
     explainException,
     identifyAddress,
+    matchAddress,
     printResults,
     parseException,
     parseStackDump,

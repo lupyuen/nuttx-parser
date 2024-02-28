@@ -41,14 +41,13 @@ explainException mcause epc mtval =
 
 identifyAddress ∷ String → Maybe { origin ∷ String , type ∷ String }
 
-identifyAddress s | isJust (match (unsafeRegex "a" noFlags) s) = Just { origin: "a", type: "b" }
+identifyAddress s | matchAddress "a" s = Just { origin: "a", type: "b" }
                   | otherwise = Nothing
 
--- identifyAddress _ = Just
---   {
---     origin: "aaaa"
---   , type: "bbbb"
---   }
+matchAddress ∷ String → String → Boolean
+
+matchAddress pattern addr = isJust $ 
+  (unsafeRegex pattern noFlags) `match` addr
 
 -- Parse the NuttX Exception and NuttX Stack Dump. Explain the NuttX Exception.
 -- `Effect` says that it will do Side Effects (printing to console)
