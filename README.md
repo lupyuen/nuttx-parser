@@ -655,7 +655,74 @@ Try it here: https://lupyuen.github.io/nuttx-tinyemu/purescript/disassemble.html
 
 ![NuttX Disassembly](https://lupyuen.github.io/images/purescript-disassembly.png)
 
+# Identify a NuttX Address
+
+_Given a NuttX Address like 80007028: How will we know whether it's in NuttX Kernel or NuttX Apps? And whether it's Code, Data, BSS or Heap?_
+
+This is how we identify a NuttX Address in PureScript: [src/Main.purs](src/Main.purs)
+
+```purescript
+-- Given an Address, identify the Origin (NuttX Kernel or App) and Type (Code / Data / BSS / Heap)
+identifyAddress ∷ String → Maybe { origin ∷ String , type ∷ AddressType }
+
+-- Address 502xxxxx comes from NuttX Kernel Code
+-- Address 800xxxxx comes from NuttX App Code (QuickJS)
+-- `|` works like `if ... else if`
+-- "a `matches` b" is same as "(matches a b)"
+-- `Just` returns an OK Value. `Nothing` returns No Value.
+identifyAddress addr
+  | "502....." `matches` addr = Just { origin: "nuttx", type: Code }
+  | "800....." `matches` addr = Just { origin: "qjs",   type: Code }
+  | otherwise = Nothing
+
+-- Address can point to Code, Data, BSS or Heap
+data AddressType = Code | Data | BSS | Heap
+
+-- How to display an Address Type
+instance Show AddressType where
+  show Code = "Code"
+  show Data = "Data"
+  show BSS  = "BSS"
+  show Heap = "Heap"
+
+-- Return True if the Address matches the Regex Pattern.
+-- Pattern is assumed to match the Entire Address.
+matches ∷ String → String → Boolean
+
+-- Match the Begin `^` and End `$` of the Address
+-- `<>` will concat 2 strings
+-- "a `unsafeRegex` b" is same as "(unsafeRegex a b)"
+matches pattern addr = 
+  let 
+    patternWrap = "^" <> pattern <> "$"
+  in
+    isJust $                            -- Is there a Match...
+      patternWrap `unsafeRegex` noFlags -- For our Regex Pattern (no special flags)
+        `match` addr                    -- Against the Address?
+
+-- Test our code. Parse the NuttX Exception and NuttX Stack Dump. Explain the NuttX Exception.
+-- `Effect` says that it will do Side Effects (printing to console)
+-- `Unit` means that no value will be returned
+-- The next line declares the Function Type. We can actually erase it, VSCode PureScript Extension will helpfully suggest it for us.
+printResults :: Effect Unit
+printResults = do
+
+  -- NuttX Kernel: 0x5020_0000 to 0x5021_98ac
+  -- NuttX App (qjs): 0x8000_0000 to 0x8006_4a28
+  logShow $ identifyAddress "502198ac" -- (Just { origin: "nuttx", type: Code })
+  logShow $ identifyAddress "8000a0e4" -- (Just { origin: "qjs", type: Code })
+  logShow $ identifyAddress "0000000800203b88" -- Nothing
+```
+
+_Tsk tsk so much Hard Coding..._
+
+Our Rules are still evolving, we're not sure how the NuttX Log Parser will be used in future.
+
+That's why we need a PureScript Editor that will allow the Rules to be tweaked easily for other platforms...
+
 # PureScript Editor for NuttX
+
+_How to build a PureScript Editor that will allow the Rules to be tweaked easily for other platforms?_
 
 To run our PureScript Editor for NuttX...
 
@@ -750,7 +817,7 @@ But NPM big-integer won't run inside a Web Browser with Plain Old JavaScript. Th
 
 # Run parseCSV in Node.js
 
-Let's run parseCSV in [src/Main.purs](src/Main.purs). Normally we run PureScript like this...
+Let's run [parseCSV](https://github.com/purescript-contrib/purescript-string-parsers/blob/main/test/Examples.purs) in Node.js. Normally we run PureScript like this...
 
 ```bash
 spago run
@@ -832,7 +899,7 @@ Suffix was: { position: 110, substring: "" }
 
 # Run parseCSV in Web Browser
 
-Here's how we run [parseCSV](src/Main.purs) in the Web Browser: [index.html](index.html)
+Here's how we run [parseCSV](https://github.com/purescript-contrib/purescript-string-parsers/blob/main/test/Examples.purs) in the Web Browser: [index.html](index.html)
 
 ```javascript
   // Import Main Module
@@ -865,8 +932,6 @@ Output:
 }
 ```
 
-TODO: Change `exampleContent2` to parse our [NuttX Log](https://gist.github.com/lupyuen/a715e4e77c011d610d0b418e97f8bf5d)
-
 We expose the PureScript Functions in the Web Browser: [index.html](index.html)
 
 ```javascript
@@ -895,7 +960,7 @@ window.StringParser_Parser
 
 # Run parseCSV in try.purescript.org
 
-To run parseCSV at [try.purescript.org](https://try.purescript.org/), change...
+To run [parseCSV](https://github.com/purescript-contrib/purescript-string-parsers/blob/main/test/Examples.purs) at [try.purescript.org](https://try.purescript.org/), change...
 
 ```purescript
 main :: Effect Unit
@@ -995,4 +1060,3 @@ The JSON Response looks like this...
   "warnings": []
 }
 ```
-
