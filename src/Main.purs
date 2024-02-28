@@ -7,7 +7,10 @@ import Prelude hiding (between)
 
 import Data.Either (Either(..))
 import Data.Int (fromStringAs, hexadecimal)
-import Data.Maybe (Maybe(..), fromMaybe)
+import Data.Maybe (Maybe(..), fromMaybe, isJust)
+import Data.String.Regex (match)
+import Data.String.Regex.Flags (noFlags)
+import Data.String.Regex.Unsafe (unsafeRegex)
 import Effect (Effect)
 import Effect.Console (log, logShow)
 import StringParser (Parser, regex, runParser, skipSpaces, string)
@@ -36,12 +39,16 @@ explainException 13 epc mtval =
 explainException mcause epc mtval =
   "Unknown Exception: mcause=" <> show mcause <> ", epc=" <> epc <> ", mtval=" <> mtval
 
-identifyAddress ∷ String → Maybe { mod ∷ String , type ∷ String }
-identifyAddress _ = Just
-  {
-    mod: "aaaa"
-  , type: "bbbb"
-  }
+identifyAddress ∷ String → Maybe { origin ∷ String , type ∷ String }
+
+identifyAddress s | isJust (match (unsafeRegex "a" noFlags) s) = Just { origin: "a", type: "b" }
+                  | otherwise = Nothing
+
+-- identifyAddress _ = Just
+--   {
+--     origin: "aaaa"
+--   , type: "bbbb"
+--   }
 
 -- Parse the NuttX Exception and NuttX Stack Dump. Explain the NuttX Exception.
 -- `Effect` says that it will do Side Effects (printing to console)
@@ -49,6 +56,9 @@ identifyAddress _ = Just
 -- The next line declares the Function Type. We can actually erase it, VSCode PureScript Extension will helpfully suggest it for us.
 printResults :: Effect Unit
 printResults = do
+
+  logShow $ identifyAddress "abc"
+  logShow $ identifyAddress "bc"
 
   -- Explain the NuttX Exception.
   -- `$ something something` is shortcut for `( something something )`

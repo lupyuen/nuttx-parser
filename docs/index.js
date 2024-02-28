@@ -3,11 +3,15 @@
 import * as Control_Applicative from "https://compile.purescript.org/output/Control.Applicative/index.js";
 import * as Control_Apply from "https://compile.purescript.org/output/Control.Apply/index.js";
 import * as Control_Bind from "https://compile.purescript.org/output/Control.Bind/index.js";
+import * as Data_Boolean from "https://compile.purescript.org/output/Data.Boolean/index.js";
 import * as Data_Either from "https://compile.purescript.org/output/Data.Either/index.js";
 import * as Data_Functor from "https://compile.purescript.org/output/Data.Functor/index.js";
 import * as Data_Int from "https://compile.purescript.org/output/Data.Int/index.js";
 import * as Data_Maybe from "https://compile.purescript.org/output/Data.Maybe/index.js";
 import * as Data_Show from "https://compile.purescript.org/output/Data.Show/index.js";
+import * as Data_String_Regex from "https://compile.purescript.org/output/Data.String.Regex/index.js";
+import * as Data_String_Regex_Flags from "https://compile.purescript.org/output/Data.String.Regex.Flags/index.js";
+import * as Data_String_Regex_Unsafe from "https://compile.purescript.org/output/Data.String.Regex.Unsafe/index.js";
 import * as Effect_Console from "https://compile.purescript.org/output/Effect.Console/index.js";
 import * as StringParser_CodePoints from "https://compile.purescript.org/output/StringParser.CodePoints/index.js";
 import * as StringParser_Parser from "https://compile.purescript.org/output/StringParser.Parser/index.js";
@@ -45,6 +49,15 @@ var logShow = /* #__PURE__ */ Effect_Console.logShow(/* #__PURE__ */ showRecord(
         return "pos";
     }
 })(Data_Show.showInt))(Data_Show.showString)));
+var logShow1 = /* #__PURE__ */ Effect_Console.logShow(/* #__PURE__ */ Data_Maybe.showMaybe(/* #__PURE__ */ showRecord(/* #__PURE__ */ Data_Show.showRecordFieldsCons({
+    reflectSymbol: function () {
+        return "origin";
+    }
+})(/* #__PURE__ */ Data_Show.showRecordFieldsConsNil({
+    reflectSymbol: function () {
+        return "type";
+    }
+})(Data_Show.showString))(Data_Show.showString))));
 
 // Parse a line of NuttX Stack Dump.
 // Given this line of NuttX Stack Dump: `stack_dump: 0xc02027e0: c0202010 00000000 00000001 00000000 00000000 00000000 8000ad8a 00000000`
@@ -113,11 +126,17 @@ var parseException = /* #__PURE__ */ discard1(/* #__PURE__ */ $$void(/* #__PURE_
         });
     });
 });
-var identifyAddress = function (v) {
-    return new Data_Maybe.Just({
-        mod: "aaaa",
-        type: "bbbb"
-    });
+var identifyAddress = function (s) {
+    if (Data_Maybe.isJust(Data_String_Regex.match(Data_String_Regex_Unsafe.unsafeRegex("a")(Data_String_Regex_Flags.noFlags))(s))) {
+        return new Data_Maybe.Just({
+            origin: "a",
+            type: "b"
+        });
+    };
+    if (Data_Boolean.otherwise) {
+        return Data_Maybe.Nothing.value;
+    };
+    throw new Error("Failed pattern match at Main (line 42, column 1 - line 42, column 69): " + [ s.constructor.name ]);
 };
 
 // Given this NuttX Exception: `riscv_exception: EXCEPTION: Instruction page fault. MCAUSE: 000000000000000c, EPC: 000000008000ad8a, MTVAL: 000000008000ad8a`
@@ -155,7 +174,7 @@ var doRunParser = function (dictShow) {
                         if (v instanceof Data_Either.Right) {
                             return Effect_Console.log("Result: " + show1(v.value0))();
                         };
-                        throw new Error("Failed pattern match at Main (line 188, column 3 - line 190, column 52): " + [ v.constructor.name ]);
+                        throw new Error("Failed pattern match at Main (line 198, column 3 - line 200, column 52): " + [ v.constructor.name ]);
                     })();
                     return Effect_Console.log("-----")();
                 };
@@ -218,11 +237,18 @@ var doRunParser2 = /* #__PURE__ */ doRunParser(/* #__PURE__ */ showRecord(/* #__
     }
 })(Data_Show.showString))(Data_Show.showString))(Data_Show.showString))(Data_Show.showString))(Data_Show.showString))(Data_Show.showString))(Data_Show.showString))(Data_Show.showString))(Data_Show.showString)));
 
+// identifyAddress _ = Just
+//   {
+//     origin: "aaaa"
+//   , type: "bbbb"
+//   }
 // Parse the NuttX Exception and NuttX Stack Dump. Explain the NuttX Exception.
 // `Effect` says that it will do Side Effects (printing to console)
 // `Unit` means that no value will be returned
 // The next line declares the Function Type. We can actually erase it, VSCode PureScript Extension will helpfully suggest it for us.
 var printResults = function __do() {
+    logShow1(identifyAddress("abc"))();
+    logShow1(identifyAddress("bc"))();
     Effect_Console.log(explainException(12)("epc")("mtval"))();
     Effect_Console.log(explainException(13)("epc")("mtval"))();
     Effect_Console.log(explainException(0)("epc")("mtval"))();
