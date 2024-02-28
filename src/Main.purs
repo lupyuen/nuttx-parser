@@ -7,7 +7,7 @@ import Prelude hiding (between)
 
 import Data.Either (Either(..))
 import Data.Int (fromStringAs, hexadecimal)
-import Data.Maybe (Maybe(..), fromMaybe, isJust)
+import Data.Maybe (Maybe(..), fromJust, fromMaybe, isJust)
 import Data.String.Regex (match)
 import Data.String.Regex.Flags (noFlags)
 import Data.String.Regex.Unsafe (unsafeRegex)
@@ -40,12 +40,20 @@ explainException mcause epc mtval =
   "Unknown Exception: mcause=" <> show mcause <> ", epc=" <> epc <> ", mtval=" <> mtval
 
 -- Identify the Address Origin (NuttX Kernel or App) and Type (Code or Data)
-identifyAddress ∷ String → Maybe { origin ∷ String , type ∷ String }
+identifyAddress ∷ String → Maybe { origin ∷ String , type ∷ AddressType }
 
 identifyAddress addr
-  | "502....." `matches` addr = Just { origin: "nuttx", type: "code" }
-  | "800....." `matches` addr = Just { origin: "qjs",   type: "code" }
+  | "502....." `matches` addr = Just { origin: "nuttx", type: Code }
+  | "800....." `matches` addr = Just { origin: "qjs",   type: Code }
   | otherwise = Nothing
+
+-- Address can point to Code or Data
+data AddressType = Code | Data
+
+-- How to display an Address Type
+instance Show AddressType where
+  show Code = "Code"
+  show Data = "Data"
 
 -- Return True if the Address matches the Regex Pattern
 matches ∷ String → String → Boolean

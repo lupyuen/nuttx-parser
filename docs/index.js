@@ -50,6 +50,37 @@ var logShow = /* #__PURE__ */ Effect_Console.logShow(/* #__PURE__ */ showRecord(
     }
 })(Data_Show.showInt))(Data_Show.showString)));
 
+// Address can point to Code or Data
+var Code = /* #__PURE__ */ (function () {
+    function Code() {
+
+    };
+    Code.value = new Code();
+    return Code;
+})();
+
+// Address can point to Code or Data
+var Data = /* #__PURE__ */ (function () {
+    function Data() {
+
+    };
+    Data.value = new Data();
+    return Data;
+})();
+
+// How to display an Address Type
+var showAddressType = {
+    show: function (v) {
+        if (v instanceof Code) {
+            return "Code";
+        };
+        if (v instanceof Data) {
+            return "Data";
+        };
+        throw new Error("Failed pattern match at Main (line 54, column 1 - line 56, column 21): " + [ v.constructor.name ]);
+    }
+};
+
 // NuttX Kernel: 0x5020_0000 to 0x5021_98ac
 // NuttX App (qjs): 0x8000_0000 to 0x8006_4a28
 var logShow1 = /* #__PURE__ */ Effect_Console.logShow(/* #__PURE__ */ Data_Maybe.showMaybe(/* #__PURE__ */ showRecord(/* #__PURE__ */ Data_Show.showRecordFieldsCons({
@@ -60,7 +91,7 @@ var logShow1 = /* #__PURE__ */ Effect_Console.logShow(/* #__PURE__ */ Data_Maybe
     reflectSymbol: function () {
         return "type";
     }
-})(Data_Show.showString))(Data_Show.showString))));
+})(showAddressType))(Data_Show.showString))));
 
 // Parse a line of NuttX Stack Dump.
 // Given this line of NuttX Stack Dump: `stack_dump: 0xc02027e0: c0202010 00000000 00000001 00000000 00000000 00000000 8000ad8a 00000000`
@@ -142,19 +173,19 @@ var identifyAddress = function (addr) {
     if (matches("502.....")(addr)) {
         return new Data_Maybe.Just({
             origin: "nuttx",
-            type: "code"
+            type: Code.value
         });
     };
     if (matches("800.....")(addr)) {
         return new Data_Maybe.Just({
             origin: "qjs",
-            type: "code"
+            type: Code.value
         });
     };
     if (Data_Boolean.otherwise) {
         return Data_Maybe.Nothing.value;
     };
-    throw new Error("Failed pattern match at Main (line 43, column 1 - line 43, column 69): " + [ addr.constructor.name ]);
+    throw new Error("Failed pattern match at Main (line 43, column 1 - line 43, column 74): " + [ addr.constructor.name ]);
 };
 
 // Given this NuttX Exception: `riscv_exception: EXCEPTION: Instruction page fault. MCAUSE: 000000000000000c, EPC: 000000008000ad8a, MTVAL: 000000008000ad8a`
@@ -192,7 +223,7 @@ var doRunParser = function (dictShow) {
                         if (v instanceof Data_Either.Right) {
                             return Effect_Console.log("Result: " + show1(v.value0))();
                         };
-                        throw new Error("Failed pattern match at Main (line 203, column 3 - line 205, column 52): " + [ v.constructor.name ]);
+                        throw new Error("Failed pattern match at Main (line 211, column 3 - line 213, column 52): " + [ v.constructor.name ]);
                     })();
                     return Effect_Console.log("-----")();
                 };
@@ -278,9 +309,12 @@ export {
     main,
     explainException,
     identifyAddress,
+    Code,
+    Data,
     matches,
     printResults,
     parseException,
     parseStackDump,
-    doRunParser
+    doRunParser,
+    showAddressType
 };
