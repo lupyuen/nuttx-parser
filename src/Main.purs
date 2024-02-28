@@ -29,13 +29,15 @@ main = printResults
 -- The next line declares the Function Type. We can actually erase it, VSCode PureScript Extension will helpfully suggest it for us.
 explainException ∷ Int → String → String → String
 
+-- Explain the NuttX Exception with mcause 13
+explainException 13 epc mtval =
+  "We hit a Load Page Fault."
+  <> " Our code at Code Address " <> epc
+  <> " tried to access the Data Address " <> mtval <> ", which is Invalid."
+
 -- Explain the NuttX Exception with mcause 12
 explainException 12 epc mtval =
   "Instruction Page Fault at " <> epc <> ", " <> mtval
-
--- Explain the NuttX Exception with mcause 13
-explainException 13 epc mtval =
-  "Load Page Fault at " <> epc <> ", " <> mtval
 
 -- Explain the Other NuttX Exceptions, that are not matched with the above
 explainException mcause epc mtval =
@@ -76,17 +78,17 @@ matches pattern addr =
 printResults :: Effect Unit
 printResults = do
 
-  -- NuttX Kernel: 0x5020_0000 to 0x5021_98ac
-  -- NuttX App (qjs): 0x8000_0000 to 0x8006_4a28
-  logShow $ identifyAddress "502198ac"
-  logShow $ identifyAddress "80064a28"
-  logShow $ identifyAddress "0000000800203b88"
-
   -- Explain the NuttX Exception.
   -- `$ something something` is shortcut for `( something something )`
+  log $ explainException 13 "8000a0e4" "0000000880203b88"
   log $ explainException 12 "epc" "mtval"
-  log $ explainException 13 "epc" "mtval"
   log $ explainException 0  "epc" "mtval"
+
+  -- NuttX Kernel: 0x5020_0000 to 0x5021_98ac
+  -- NuttX App (qjs): 0x8000_0000 to 0x8006_4a28
+  logShow $ identifyAddress "502198ac" -- (Just { origin: "nuttx", type: Code })
+  logShow $ identifyAddress "8000a0e4" -- (Just { origin: "qjs", type: Code })
+  logShow $ identifyAddress "0000000800203b88" -- Nothing
 
   -- Parse the NuttX Exception
   doRunParser "parseException" parseException

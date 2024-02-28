@@ -78,7 +78,7 @@ var showAddressType = {
         if (v instanceof Data) {
             return "Data";
         };
-        throw new Error("Failed pattern match at Main (line 56, column 1 - line 58, column 21): " + [ v.constructor.name ]);
+        throw new Error("Failed pattern match at Main (line 58, column 1 - line 60, column 21): " + [ v.constructor.name ]);
     }
 };
 
@@ -137,7 +137,7 @@ var parseStackDump = /* #__PURE__ */ discard1(/* #__PURE__ */ $$void(/* #__PURE_
 //   "[    6.242000] stack_dump: 0xc02027e0: c0202010 00000000 00000001 00000000 00000000 00000000 8000ad8a 00000000"
 // Parse the NuttX Exception.
 // Given this NuttX Exception: `riscv_exception: EXCEPTION: Instruction page fault. MCAUSE: 000000000000000c, EPC: 000000008000ad8a, MTVAL: 000000008000ad8a`
-// Result: { epc: "000000008000ad8a", exception: "Instruction page fault", mcause: 12, mtval: "000000008000ad8a" }
+// Result: { epc: "8000ad8a", exception: "Instruction page fault", mcause: 12, mtval: "8000ad8a" }
 // The next line declares the Function Type. We can actually erase it, VSCode PureScript Extension will helpfully suggest it for us.
 var parseException = /* #__PURE__ */ discard1(/* #__PURE__ */ $$void(/* #__PURE__ */ applyFirst(/* #__PURE__ */ applyFirst(/* #__PURE__ */ applyFirst(/* #__PURE__ */ StringParser_CodePoints.string("riscv_exception:"))(StringParser_CodePoints.skipSpaces))(/* #__PURE__ */ StringParser_CodePoints.string("EXCEPTION:")))(StringParser_CodePoints.skipSpaces)))(function () {
     return bind(applyFirst(applyFirst(StringParser_CodePoints.regex("[^.]+"))(StringParser_CodePoints.string(".")))(StringParser_CodePoints.skipSpaces))(function (exception) {
@@ -188,7 +188,7 @@ var identifyAddress = function (addr) {
     if (Data_Boolean.otherwise) {
         return Data_Maybe.Nothing.value;
     };
-    throw new Error("Failed pattern match at Main (line 45, column 1 - line 45, column 74): " + [ addr.constructor.name ]);
+    throw new Error("Failed pattern match at Main (line 47, column 1 - line 47, column 74): " + [ addr.constructor.name ]);
 };
 
 // Given this NuttX Exception: `riscv_exception: EXCEPTION: Instruction page fault. MCAUSE: 000000000000000c, EPC: 000000008000ad8a, MTVAL: 000000008000ad8a`
@@ -197,11 +197,11 @@ var identifyAddress = function (addr) {
 var explainException = function (v) {
     return function (v1) {
         return function (v2) {
+            if (v === 13) {
+                return "We hit a Load Page Fault." + (" Our code at Code Address " + (v1 + (" tried to access the Data Address " + (v2 + ", which is Invalid."))));
+            };
             if (v === 12) {
                 return "Instruction Page Fault at " + (v1 + (", " + v2));
-            };
-            if (v === 13) {
-                return "Load Page Fault at " + (v1 + (", " + v2));
             };
             return "Unknown Exception: mcause=" + (show(v) + (", epc=" + (v1 + (", mtval=" + v2))));
         };
@@ -226,7 +226,7 @@ var doRunParser = function (dictShow) {
                         if (v instanceof Data_Either.Right) {
                             return Effect_Console.log("Result: " + show1(v.value0))();
                         };
-                        throw new Error("Failed pattern match at Main (line 229, column 3 - line 231, column 52): " + [ v.constructor.name ]);
+                        throw new Error("Failed pattern match at Main (line 231, column 3 - line 233, column 52): " + [ v.constructor.name ]);
                     })();
                     return Effect_Console.log("-----")();
                 };
@@ -294,12 +294,12 @@ var doRunParser2 = /* #__PURE__ */ doRunParser(/* #__PURE__ */ showRecord(/* #__
 // `Unit` means that no value will be returned
 // The next line declares the Function Type. We can actually erase it, VSCode PureScript Extension will helpfully suggest it for us.
 var printResults = function __do() {
-    logShow1(identifyAddress("502198ac"))();
-    logShow1(identifyAddress("80064a28"))();
-    logShow1(identifyAddress("0000000800203b88"))();
+    Effect_Console.log(explainException(13)("8000a0e4")("0000000880203b88"))();
     Effect_Console.log(explainException(12)("epc")("mtval"))();
-    Effect_Console.log(explainException(13)("epc")("mtval"))();
     Effect_Console.log(explainException(0)("epc")("mtval"))();
+    logShow1(identifyAddress("502198ac"))();
+    logShow1(identifyAddress("8000a0e4"))();
+    logShow1(identifyAddress("0000000800203b88"))();
     doRunParser1("parseException")(parseException)("riscv_exception: EXCEPTION: Instruction page fault. MCAUSE: 000000000000000c, EPC: 000000008000ad8a, MTVAL: 000000008000ad8a")();
     return doRunParser2("parseStackDump")(parseStackDump)("stack_dump: 0xc02027e0: c0202010 00000000 00000001 00000000 00000000 00000000 8000ad8a 00000000")();
 };
