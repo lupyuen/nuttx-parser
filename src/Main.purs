@@ -39,14 +39,18 @@ explainException 13 epc mtval =
 explainException mcause epc mtval =
   "Unknown Exception: mcause=" <> show mcause <> ", epc=" <> epc <> ", mtval=" <> mtval
 
+-- Identify the Address Origin (NuttX Kernel or App) and Type (Code or Data)
 identifyAddress ∷ String → Maybe { origin ∷ String , type ∷ String }
 
-identifyAddress s | matchAddress "a" s = Just { origin: "a", type: "b" }
-                  | otherwise = Nothing
+identifyAddress addr
+  | "502....." `matches` addr = Just { origin: "nuttx", type: "code" }
+  | "800....." `matches` addr = Just { origin: "qjs",   type: "code" }
+  | otherwise = Nothing
 
-matchAddress ∷ String → String → Boolean
+-- Return True if the Address matches the Regex Pattern
+matches ∷ String → String → Boolean
 
-matchAddress pattern addr = isJust $ 
+matches pattern addr = isJust $ 
   (unsafeRegex pattern noFlags) `match` addr
 
 -- Parse the NuttX Exception and NuttX Stack Dump. Explain the NuttX Exception.
@@ -56,14 +60,16 @@ matchAddress pattern addr = isJust $
 printResults :: Effect Unit
 printResults = do
 
-  logShow $ identifyAddress "abc"
-  logShow $ identifyAddress "bc"
+  -- NuttX Kernel: 0x5020_0000 to 0x5021_98ac
+  -- NuttX App (qjs): 0x8000_0000 to 0x8006_4a28
+  logShow $ identifyAddress "502198ac"
+  logShow $ identifyAddress "80064a28"
 
   -- Explain the NuttX Exception.
   -- `$ something something` is shortcut for `( something something )`
   log $ explainException 12 "epc" "mtval"
   log $ explainException 13 "epc" "mtval"
-  log $ explainException 0 "epc" "mtval"
+  log $ explainException 0  "epc" "mtval"
 
   -- Parse the NuttX Exception
   doRunParser "parseException" parseException

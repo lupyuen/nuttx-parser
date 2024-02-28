@@ -49,6 +49,9 @@ var logShow = /* #__PURE__ */ Effect_Console.logShow(/* #__PURE__ */ showRecord(
         return "pos";
     }
 })(Data_Show.showInt))(Data_Show.showString)));
+
+// NuttX Kernel: 0x5020_0000 to 0x5021_98ac
+// NuttX App (qjs): 0x8000_0000 to 0x8006_4a28
 var logShow1 = /* #__PURE__ */ Effect_Console.logShow(/* #__PURE__ */ Data_Maybe.showMaybe(/* #__PURE__ */ showRecord(/* #__PURE__ */ Data_Show.showRecordFieldsCons({
     reflectSymbol: function () {
         return "origin";
@@ -126,22 +129,32 @@ var parseException = /* #__PURE__ */ discard1(/* #__PURE__ */ $$void(/* #__PURE_
         });
     });
 });
-var matchAddress = function (pattern) {
+
+// Return True if the Address matches the Regex Pattern
+var matches = function (pattern) {
     return function (addr) {
         return Data_Maybe.isJust(Data_String_Regex.match(Data_String_Regex_Unsafe.unsafeRegex(pattern)(Data_String_Regex_Flags.noFlags))(addr));
     };
 };
-var identifyAddress = function (s) {
-    if (matchAddress("a")(s)) {
+
+// Identify the Address Origin (NuttX Kernel or App) and Type (Code or Data)
+var identifyAddress = function (addr) {
+    if (matches("502.....")(addr)) {
         return new Data_Maybe.Just({
-            origin: "a",
-            type: "b"
+            origin: "nuttx",
+            type: "code"
+        });
+    };
+    if (matches("800.....")(addr)) {
+        return new Data_Maybe.Just({
+            origin: "qjs",
+            type: "code"
         });
     };
     if (Data_Boolean.otherwise) {
         return Data_Maybe.Nothing.value;
     };
-    throw new Error("Failed pattern match at Main (line 42, column 1 - line 42, column 69): " + [ s.constructor.name ]);
+    throw new Error("Failed pattern match at Main (line 43, column 1 - line 43, column 69): " + [ addr.constructor.name ]);
 };
 
 // Given this NuttX Exception: `riscv_exception: EXCEPTION: Instruction page fault. MCAUSE: 000000000000000c, EPC: 000000008000ad8a, MTVAL: 000000008000ad8a`
@@ -179,7 +192,7 @@ var doRunParser = function (dictShow) {
                         if (v instanceof Data_Either.Right) {
                             return Effect_Console.log("Result: " + show1(v.value0))();
                         };
-                        throw new Error("Failed pattern match at Main (line 197, column 3 - line 199, column 52): " + [ v.constructor.name ]);
+                        throw new Error("Failed pattern match at Main (line 203, column 3 - line 205, column 52): " + [ v.constructor.name ]);
                     })();
                     return Effect_Console.log("-----")();
                 };
@@ -247,8 +260,8 @@ var doRunParser2 = /* #__PURE__ */ doRunParser(/* #__PURE__ */ showRecord(/* #__
 // `Unit` means that no value will be returned
 // The next line declares the Function Type. We can actually erase it, VSCode PureScript Extension will helpfully suggest it for us.
 var printResults = function __do() {
-    logShow1(identifyAddress("abc"))();
-    logShow1(identifyAddress("bc"))();
+    logShow1(identifyAddress("502198ac"))();
+    logShow1(identifyAddress("80064a28"))();
     Effect_Console.log(explainException(12)("epc")("mtval"))();
     Effect_Console.log(explainException(13)("epc")("mtval"))();
     Effect_Console.log(explainException(0)("epc")("mtval"))();
@@ -265,7 +278,7 @@ export {
     main,
     explainException,
     identifyAddress,
-    matchAddress,
+    matches,
     printResults,
     parseException,
     parseStackDump,
