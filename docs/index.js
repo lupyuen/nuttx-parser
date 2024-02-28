@@ -1,5 +1,6 @@
 // Parse the NuttX Exception and NuttX Stack Dump. Explain the NuttX Exception.
 // Based on https://github.com/purescript-contrib/purescript-string-parsers/blob/main/test/Examples.purs
+// Main Module will be started by `spago run`
 import * as Control_Applicative from "https://compile.purescript.org/output/Control.Applicative/index.js";
 import * as Control_Apply from "https://compile.purescript.org/output/Control.Apply/index.js";
 import * as Control_Bind from "https://compile.purescript.org/output/Control.Bind/index.js";
@@ -51,7 +52,7 @@ var logShow = /* #__PURE__ */ Effect_Console.logShow(/* #__PURE__ */ showRecord(
     }
 })(Data_Show.showInt))(Data_Show.showString)));
 
-// Address can point to Code or Data
+// Address can point to Code, Data, BSS or Heap
 var Code = /* #__PURE__ */ (function () {
     function Code() {
 
@@ -60,13 +61,31 @@ var Code = /* #__PURE__ */ (function () {
     return Code;
 })();
 
-// Address can point to Code or Data
+// Address can point to Code, Data, BSS or Heap
 var Data = /* #__PURE__ */ (function () {
     function Data() {
 
     };
     Data.value = new Data();
     return Data;
+})();
+
+// Address can point to Code, Data, BSS or Heap
+var BSS = /* #__PURE__ */ (function () {
+    function BSS() {
+
+    };
+    BSS.value = new BSS();
+    return BSS;
+})();
+
+// Address can point to Code, Data, BSS or Heap
+var Heap = /* #__PURE__ */ (function () {
+    function Heap() {
+
+    };
+    Heap.value = new Heap();
+    return Heap;
 })();
 
 // How to display an Address Type
@@ -78,7 +97,13 @@ var showAddressType = {
         if (v instanceof Data) {
             return "Data";
         };
-        throw new Error("Failed pattern match at Main (line 58, column 1 - line 60, column 21): " + [ v.constructor.name ]);
+        if (v instanceof BSS) {
+            return "BSS";
+        };
+        if (v instanceof Heap) {
+            return "Heap";
+        };
+        throw new Error("Failed pattern match at Main (line 69, column 1 - line 73, column 21): " + [ v.constructor.name ]);
     }
 };
 
@@ -133,6 +158,7 @@ var parseStackDump = /* #__PURE__ */ discard1(/* #__PURE__ */ $$void(/* #__PURE_
 });
 
 // Parse the line of NuttX Stack Dump with Timestamp
+// Result: { addr: "c02027e0", v1: "c0202010", v2: "00000000", v3: "00000001", v4: "00000000", v5: "00000000", v6: "00000000", v7: "8000ad8a", v8: "00000000" }
 // doRunParser "parseStackDump" parseStackDump
 //   "[    6.242000] stack_dump: 0xc02027e0: c0202010 00000000 00000001 00000000 00000000 00000000 8000ad8a 00000000"
 // Parse the NuttX Exception.
@@ -171,7 +197,7 @@ var matches = function (pattern) {
     };
 };
 
-// Identify the Address Origin (NuttX Kernel or App) and Type (Code or Data)
+// Given an Address, identify the Origin (NuttX Kernel or App) and Type (Code / Data / BSS / Heap)
 var identifyAddress = function (addr) {
     if (matches("502.....")(addr)) {
         return new Data_Maybe.Just({
@@ -188,11 +214,11 @@ var identifyAddress = function (addr) {
     if (Data_Boolean.otherwise) {
         return Data_Maybe.Nothing.value;
     };
-    throw new Error("Failed pattern match at Main (line 47, column 1 - line 47, column 74): " + [ addr.constructor.name ]);
+    throw new Error("Failed pattern match at Main (line 53, column 1 - line 53, column 74): " + [ addr.constructor.name ]);
 };
 
-// Given this NuttX Exception: `riscv_exception: EXCEPTION: Instruction page fault. MCAUSE: 000000000000000c, EPC: 000000008000ad8a, MTVAL: 000000008000ad8a`
-// Explain in friendly words: "NuttX stopped because it tried to read or write an Invalid Address. The Invalid Address is 8000ad8a. The code that caused this is at 8000ad8a. Check the NuttX Disassembly for the Source Code of the crashing line."
+// Given this NuttX Exception: `riscv_exception: EXCEPTION: Load page fault. MCAUSE: 000000000000000d, EPC: 000000008000a0e4, MTVAL: 0000000880203b88`
+// Explain in friendly words: "We hit a Load Page Fault. Our code at Code Address 8000a0e4 tried to access the Data Address 0000000880203b88, which is Invalid."
 // The next line declares the Function Type. We can actually erase it, VSCode PureScript Extension will helpfully suggest it for us.
 var explainException = function (v) {
     return function (v1) {
@@ -208,9 +234,9 @@ var explainException = function (v) {
     };
 };
 
-// | Shows the results of calling `runParser`. You typically don't want to use
-// | this function when writing a parser because it doesn't help you debug
-// | your code when you write it incorrectly.
+// Shows the results of calling `runParser`. We typically don't want to use
+// this function when writing a parser because it doesn't help us debug
+// our code when we write it incorrectly.
 var doRunParser = function (dictShow) {
     var show1 = Data_Show.show(dictShow);
     return function (parserName) {
@@ -226,7 +252,7 @@ var doRunParser = function (dictShow) {
                         if (v instanceof Data_Either.Right) {
                             return Effect_Console.log("Result: " + show1(v.value0))();
                         };
-                        throw new Error("Failed pattern match at Main (line 231, column 3 - line 233, column 52): " + [ v.constructor.name ]);
+                        throw new Error("Failed pattern match at Main (line 250, column 3 - line 252, column 52): " + [ v.constructor.name ]);
                     })();
                     return Effect_Console.log("-----")();
                 };
@@ -289,7 +315,7 @@ var doRunParser2 = /* #__PURE__ */ doRunParser(/* #__PURE__ */ showRecord(/* #__
     }
 })(Data_Show.showString))(Data_Show.showString))(Data_Show.showString))(Data_Show.showString))(Data_Show.showString))(Data_Show.showString))(Data_Show.showString))(Data_Show.showString))(Data_Show.showString)));
 
-// Parse the NuttX Exception and NuttX Stack Dump. Explain the NuttX Exception.
+// Test our code. Parse the NuttX Exception and NuttX Stack Dump. Explain the NuttX Exception.
 // `Effect` says that it will do Side Effects (printing to console)
 // `Unit` means that no value will be returned
 // The next line declares the Function Type. We can actually erase it, VSCode PureScript Extension will helpfully suggest it for us.
@@ -315,6 +341,8 @@ export {
     identifyAddress,
     Code,
     Data,
+    BSS,
+    Heap,
     matches,
     printResults,
     parseException,
