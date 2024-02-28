@@ -84,6 +84,9 @@ var parseStackDump = /* #__PURE__ */ discard1(/* #__PURE__ */ $$void(/* #__PURE_
     });
 });
 
+// Parse the line of NuttX Stack Dump with Timestamp
+// doRunParser "parseStackDump" parseStackDump
+//   "[    6.242000] stack_dump: 0xc02027e0: c0202010 00000000 00000001 00000000 00000000 00000000 8000ad8a 00000000"
 // Parse the NuttX Exception.
 // Given this NuttX Exception: `riscv_exception: EXCEPTION: Instruction page fault. MCAUSE: 000000000000000c, EPC: 000000008000ad8a, MTVAL: 000000008000ad8a`
 // Result: { epc: "000000008000ad8a", exception: "Instruction page fault", mcause: 12, mtval: "000000008000ad8a" }
@@ -111,9 +114,6 @@ var parseException = /* #__PURE__ */ discard1(/* #__PURE__ */ $$void(/* #__PURE_
     });
 });
 
-// Parse the line of NuttX Stack Dump with Timestamp
-// doRunParser "parseStackDump" parseStackDump
-//   "[    6.242000] stack_dump: 0xc02027e0: c0202010 00000000 00000001 00000000 00000000 00000000 8000ad8a 00000000"
 // Given this NuttX Exception: `riscv_exception: EXCEPTION: Instruction page fault. MCAUSE: 000000000000000c, EPC: 000000008000ad8a, MTVAL: 000000008000ad8a`
 // Explain in friendly words: "NuttX stopped because it tried to read or write an Invalid Address. The Invalid Address is 8000ad8a. The code that caused this is at 8000ad8a. Check the NuttX Disassembly for the Source Code of the crashing line."
 // The next line declares the Function Type. We can actually erase it, VSCode PureScript Extension will helpfully suggest it for us.
@@ -149,7 +149,7 @@ var doRunParser = function (dictShow) {
                         if (v instanceof Data_Either.Right) {
                             return Effect_Console.log("Result: " + show1(v.value0))();
                         };
-                        throw new Error("Failed pattern match at Main (line 184, column 3 - line 186, column 52): " + [ v.constructor.name ]);
+                        throw new Error("Failed pattern match at Main (line 181, column 3 - line 183, column 52): " + [ v.constructor.name ]);
                     })();
                     return Effect_Console.log("-----")();
                 };
@@ -231,8 +231,8 @@ var printResults = function __do() {
 var main = printResults;
 export {
     main,
-    printResults,
     explainException,
+    printResults,
     parseException,
     parseStackDump,
     doRunParser

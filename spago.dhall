@@ -13,12 +13,9 @@ to generate this file without the comments in this block.
 { name = "my-project"
 , dependencies =
   [ "console"
-  , "control"
   , "effect"
   , "either"
-  , "foldable-traversable"
   , "integers"
-  , "lists"
   , "maybe"
   , "prelude"
   , "string-parsers"
