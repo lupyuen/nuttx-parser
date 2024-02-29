@@ -70,7 +70,7 @@ identifyAddress ∷
 identifyAddress addr
   | "502....." `matches` addr = Just { origin: "nuttx", type: Code }
   | "800....." `matches` addr = Just { origin: "qjs",   type: Code }
-  | otherwise = Nothing
+  | otherwise = Nothing  -- Unknown Address
 
 -- Address can point to Code, Data, BSS or Heap
 data AddressType = Code | Data | BSS | Heap
@@ -94,7 +94,7 @@ matches ∷
 -- "a `unsafeRegex` b" is same as "(unsafeRegex a b)"
 matches pattern addr =
   let
-    patternWrap = "^" <> pattern <> "$"
+    patternWrap = "^" <> pattern <> "$" -- Regex Pattern becomes `^502.....$`
   in
     isJust $                            -- Is there a Match...
       patternWrap `unsafeRegex` noFlags -- For our Regex Pattern (no special flags)
