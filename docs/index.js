@@ -16,28 +16,17 @@ import * as Data_String_Regex_Flags from "https://compile.purescript.org/output/
 import * as Data_String_Regex_Unsafe from "https://compile.purescript.org/output/Data.String.Regex.Unsafe/index.js";
 import * as Effect_Console from "https://compile.purescript.org/output/Effect.Console/index.js";
 import * as StringParser_CodePoints from "https://compile.purescript.org/output/StringParser.CodePoints/index.js";
+import * as StringParser_Combinators from "https://compile.purescript.org/output/StringParser.Combinators/index.js";
 import * as StringParser_Parser from "https://compile.purescript.org/output/StringParser.Parser/index.js";
 var discard = /* #__PURE__ */ Control_Bind.discard(Control_Bind.discardUnit);
 var discard1 = /* #__PURE__ */ discard(StringParser_Parser.bindParser);
+var applyFirst = /* #__PURE__ */ Control_Apply.applyFirst(StringParser_Parser.applyParser);
 
-// To parse the line: `stack_dump: 0xc02027e0: c0202010 00000000 00000001 00000000 00000000 00000000 8000ad8a 00000000`
-// If the line begins with a Timestamp: `[    6.242000] `
-// Skip `[    `
-// `void` means ignore the Text Captured
-// `$ something something` is shortcut for `( something something )`
-// `<*` is the Delimiter between Patterns
-// void $
-//   string "["    -- Match the string `[`
-//   <* skipSpaces -- Skip the following spaces
-//   <* regex "[.0-9]+" -- Skip the number
-//   <* string "]" -- Match the string `]`
-//   <* skipSpaces -- Skip the following spaces
 // Skip `stack_dump: `
 // `void` means ignore the Text Captured
 // `$ something something` is shortcut for `( something something )`
 // `<*` is the Delimiter between Patterns
 var $$void = /* #__PURE__ */ Data_Functor["void"](StringParser_Parser.functorParser);
-var applyFirst = /* #__PURE__ */ Control_Apply.applyFirst(StringParser_Parser.applyParser);
 var bind = /* #__PURE__ */ Control_Bind.bind(StringParser_Parser.bindParser);
 var pure = /* #__PURE__ */ Control_Applicative.pure(StringParser_Parser.applicativeParser);
 var show = /* #__PURE__ */ Data_Show.show(Data_Show.showInt);
@@ -103,7 +92,7 @@ var showAddressType = {
         if (v instanceof Heap) {
             return "Heap";
         };
-        throw new Error("Failed pattern match at Main (line 73, column 1 - line 77, column 21): " + [ v.constructor.name ]);
+        throw new Error("Failed pattern match at Main (line 79, column 1 - line 83, column 21): " + [ v.constructor.name ]);
     }
 };
 
@@ -123,27 +112,29 @@ var logShow1 = /* #__PURE__ */ Effect_Console.logShow(/* #__PURE__ */ Data_Maybe
 // Given this line of NuttX Stack Dump: `stack_dump: 0xc02027e0: c0202010 00000000 00000001 00000000 00000000 00000000 8000ad8a 00000000`
 // Result: { addr: "c02027e0", timestamp: "6.242000", v1: "c0202010", v2: "00000000", v3: "00000001", v4: "00000000", v5: "00000000", v6: "00000000", v7: "8000ad8a", v8: "00000000" }
 // The next line declares the Function Type. We can actually erase it, VSCode PureScript Extension will helpfully suggest it for us.
-var parseStackDump = /* #__PURE__ */ discard1(/* #__PURE__ */ $$void(/* #__PURE__ */ applyFirst(/* #__PURE__ */ StringParser_CodePoints.string("stack_dump:"))(StringParser_CodePoints.skipSpaces)))(function () {
-    return discard1($$void(StringParser_CodePoints.string("0x")))(function () {
-        return bind(applyFirst(applyFirst(StringParser_CodePoints.regex("[0-9a-f]+"))(StringParser_CodePoints.string(":")))(StringParser_CodePoints.skipSpaces))(function (addr) {
-            return bind(applyFirst(StringParser_CodePoints.regex("[0-9a-f]+"))(StringParser_CodePoints.skipSpaces))(function (v1) {
-                return bind(applyFirst(StringParser_CodePoints.regex("[0-9a-f]+"))(StringParser_CodePoints.skipSpaces))(function (v2) {
-                    return bind(applyFirst(StringParser_CodePoints.regex("[0-9a-f]+"))(StringParser_CodePoints.skipSpaces))(function (v3) {
-                        return bind(applyFirst(StringParser_CodePoints.regex("[0-9a-f]+"))(StringParser_CodePoints.skipSpaces))(function (v4) {
-                            return bind(applyFirst(StringParser_CodePoints.regex("[0-9a-f]+"))(StringParser_CodePoints.skipSpaces))(function (v5) {
-                                return bind(applyFirst(StringParser_CodePoints.regex("[0-9a-f]+"))(StringParser_CodePoints.skipSpaces))(function (v6) {
-                                    return bind(applyFirst(StringParser_CodePoints.regex("[0-9a-f]+"))(StringParser_CodePoints.skipSpaces))(function (v7) {
-                                        return bind(applyFirst(StringParser_CodePoints.regex("[0-9a-f]+"))(StringParser_CodePoints.skipSpaces))(function (v8) {
-                                            return pure({
-                                                addr: addr,
-                                                v1: v1,
-                                                v2: v2,
-                                                v3: v3,
-                                                v4: v4,
-                                                v5: v5,
-                                                v6: v6,
-                                                v7: v7,
-                                                v8: v8
+var parseStackDump = /* #__PURE__ */ discard1(/* #__PURE__ */ StringParser_Combinators.optional(/* #__PURE__ */ applyFirst(/* #__PURE__ */ applyFirst(/* #__PURE__ */ applyFirst(/* #__PURE__ */ applyFirst(/* #__PURE__ */ StringParser_CodePoints.string("["))(StringParser_CodePoints.skipSpaces))(/* #__PURE__ */ StringParser_CodePoints.regex("[.0-9]+")))(/* #__PURE__ */ StringParser_CodePoints.string("]")))(StringParser_CodePoints.skipSpaces)))(function () {
+    return discard1($$void(applyFirst(StringParser_CodePoints.string("stack_dump:"))(StringParser_CodePoints.skipSpaces)))(function () {
+        return discard1($$void(StringParser_CodePoints.string("0x")))(function () {
+            return bind(applyFirst(applyFirst(StringParser_CodePoints.regex("[0-9a-f]+"))(StringParser_CodePoints.string(":")))(StringParser_CodePoints.skipSpaces))(function (addr) {
+                return bind(applyFirst(StringParser_CodePoints.regex("[0-9a-f]+"))(StringParser_CodePoints.skipSpaces))(function (v1) {
+                    return bind(applyFirst(StringParser_CodePoints.regex("[0-9a-f]+"))(StringParser_CodePoints.skipSpaces))(function (v2) {
+                        return bind(applyFirst(StringParser_CodePoints.regex("[0-9a-f]+"))(StringParser_CodePoints.skipSpaces))(function (v3) {
+                            return bind(applyFirst(StringParser_CodePoints.regex("[0-9a-f]+"))(StringParser_CodePoints.skipSpaces))(function (v4) {
+                                return bind(applyFirst(StringParser_CodePoints.regex("[0-9a-f]+"))(StringParser_CodePoints.skipSpaces))(function (v5) {
+                                    return bind(applyFirst(StringParser_CodePoints.regex("[0-9a-f]+"))(StringParser_CodePoints.skipSpaces))(function (v6) {
+                                        return bind(applyFirst(StringParser_CodePoints.regex("[0-9a-f]+"))(StringParser_CodePoints.skipSpaces))(function (v7) {
+                                            return bind(applyFirst(StringParser_CodePoints.regex("[0-9a-f]+"))(StringParser_CodePoints.skipSpaces))(function (v8) {
+                                                return pure({
+                                                    addr: addr,
+                                                    v1: v1,
+                                                    v2: v2,
+                                                    v3: v3,
+                                                    v4: v4,
+                                                    v5: v5,
+                                                    v6: v6,
+                                                    v7: v7,
+                                                    v8: v8
+                                                });
                                             });
                                         });
                                     });
@@ -157,10 +148,6 @@ var parseStackDump = /* #__PURE__ */ discard1(/* #__PURE__ */ $$void(/* #__PURE_
     });
 });
 
-// Parse the line of NuttX Stack Dump with Timestamp
-// Result: { addr: "c02027e0", v1: "c0202010", v2: "00000000", v3: "00000001", v4: "00000000", v5: "00000000", v6: "00000000", v7: "8000ad8a", v8: "00000000" }
-// doRunParser "parseStackDump" parseStackDump
-//   "[    6.242000] stack_dump: 0xc02027e0: c0202010 00000000 00000001 00000000 00000000 00000000 8000ad8a 00000000"
 // Parse the NuttX Exception.
 // Given this NuttX Exception: `riscv_exception: EXCEPTION: Instruction page fault. MCAUSE: 000000000000000c, EPC: 000000008000ad8a, MTVAL: 000000008000ad8a`
 // Result: { epc: "8000ad8a", exception: "Instruction page fault", mcause: 12, mtval: "8000ad8a" }
@@ -214,7 +201,7 @@ var identifyAddress = function (addr) {
     if (Data_Boolean.otherwise) {
         return Data_Maybe.Nothing.value;
     };
-    throw new Error("Failed pattern match at Main (line 57, column 1 - line 57, column 74): " + [ addr.constructor.name ]);
+    throw new Error("Failed pattern match at Main (line 57, column 1 - line 63, column 6): " + [ addr.constructor.name ]);
 };
 
 // Given this NuttX Exception: `riscv_exception: EXCEPTION: Load page fault. MCAUSE: 000000000000000d, EPC: 000000008000a0e4, MTVAL: 0000000880203b88`
@@ -252,7 +239,7 @@ var doRunParser = function (dictShow) {
                         if (v instanceof Data_Either.Right) {
                             return Effect_Console.log("Result: " + show1(v.value0))();
                         };
-                        throw new Error("Failed pattern match at Main (line 262, column 3 - line 264, column 52): " + [ v.constructor.name ]);
+                        throw new Error("Failed pattern match at Main (line 282, column 3 - line 284, column 52): " + [ v.constructor.name ]);
                     })();
                     return Effect_Console.log("-----")();
                 };
@@ -327,7 +314,8 @@ var printResults = function __do() {
     logShow1(identifyAddress("8000a0e4"))();
     logShow1(identifyAddress("0000000800203b88"))();
     doRunParser1("parseException")(parseException)("riscv_exception: EXCEPTION: Instruction page fault. MCAUSE: 000000000000000c, EPC: 000000008000ad8a, MTVAL: 000000008000ad8a")();
-    return doRunParser2("parseStackDump")(parseStackDump)("stack_dump: 0xc02027e0: c0202010 00000000 00000001 00000000 00000000 00000000 8000ad8a 00000000")();
+    doRunParser2("parseStackDump")(parseStackDump)("stack_dump: 0xc02027e0: c0202010 00000000 00000001 00000000 00000000 00000000 8000ad8a 00000000")();
+    return doRunParser2("parseStackDump")(parseStackDump)("[    6.242000] stack_dump: 0xc02027e0: c0202010 00000000 00000001 00000000 00000000 00000000 8000ad8a 00000000")();
 };
 
 // Main Function that will run our Test Code.
