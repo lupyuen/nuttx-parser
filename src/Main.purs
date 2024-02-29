@@ -228,7 +228,7 @@ parseStackDump = do
 
   -- If the line begins with a Timestamp: `[    6.242000] `
   -- Skip `[    `
-  -- `void` means ignore the Text Captured
+  -- `optional` means Timestamp may or may not appear
   -- `$ something something` is shortcut for `( something something )`
   -- `<*` is the Delimiter between Patterns
   optional $      -- Timestamp may or may not appear
