@@ -252,7 +252,7 @@ var doRunParser = function (dictShow) {
                         if (v instanceof Data_Either.Right) {
                             return Effect_Console.log("Result: " + show1(v.value0))();
                         };
-                        throw new Error("Failed pattern match at Main (line 254, column 3 - line 256, column 52): " + [ v.constructor.name ]);
+                        throw new Error("Failed pattern match at Main (line 261, column 3 - line 263, column 52): " + [ v.constructor.name ]);
                     })();
                     return Effect_Console.log("-----")();
                 };

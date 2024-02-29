@@ -129,10 +129,17 @@ printResults = do
 -- Given this NuttX Exception: `riscv_exception: EXCEPTION: Instruction page fault. MCAUSE: 000000000000000c, EPC: 000000008000ad8a, MTVAL: 000000008000ad8a`
 -- Result: { epc: "8000ad8a", exception: "Instruction page fault", mcause: 12, mtval: "8000ad8a" }
 -- The next line declares the Function Type. We can actually erase it, VSCode PureScript Extension will helpfully suggest it for us.
-parseException ∷ Parser { exception ∷ String, mcause :: Int, epc :: String, mtval :: String }
+parseException ∷ Parser  -- We're creating a Parser...
+  {                      -- That accepts a String and returns...
+    exception ∷ String   -- Exception Text: `Instruction page fault`
+  , mcause :: Int        -- MCAUSE: 12
+  , epc :: String        -- EPC: `8000ad8a`
+  , mtval :: String      -- MTVAL: `8000ad8a`
+  }
+
+-- To parse the line: `riscv_exception: EXCEPTION: Instruction page fault. MCAUSE: 000000000000000c, EPC: 000000008000ad8a, MTVAL: 000000008000ad8a`
 parseException = do
 
-  -- To parse the line: `riscv_exception: EXCEPTION: Instruction page fault. MCAUSE: 000000000000000c, EPC: 000000008000ad8a, MTVAL: 000000008000ad8a`
   -- Skip `riscv_exception: EXCEPTION: `
   -- `void` means ignore the Text Captured
   -- `$ something something` is shortcut for `( something something )`
