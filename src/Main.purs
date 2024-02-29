@@ -30,7 +30,11 @@ main = printResults -- Run our Test Code and print the results
 -- Given this NuttX Exception: `riscv_exception: EXCEPTION: Load page fault. MCAUSE: 000000000000000d, EPC: 000000008000a0e4, MTVAL: 0000000880203b88`
 -- Explain in friendly words: "We hit a Load Page Fault. Our code at Code Address 8000a0e4 tried to access the Data Address 0000000880203b88, which is Invalid."
 -- The next line declares the Function Type. We can actually erase it, VSCode PureScript Extension will helpfully suggest it for us.
-explainException ∷ Int → String → String → String
+explainException ∷ 
+  Int       -- MCAUSE: Cause of Exception
+  → String  -- EPC: Exception Program Counter
+  → String  -- MTVAL: Exception Value
+  → String  -- Returns the Exception Explanation
 
 -- Explain the NuttX Exception with mcause 13
 -- `<>` will concat 2 strings

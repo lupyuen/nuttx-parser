@@ -103,7 +103,7 @@ var showAddressType = {
         if (v instanceof Heap) {
             return "Heap";
         };
-        throw new Error("Failed pattern match at Main (line 69, column 1 - line 73, column 21): " + [ v.constructor.name ]);
+        throw new Error("Failed pattern match at Main (line 73, column 1 - line 77, column 21): " + [ v.constructor.name ]);
     }
 };
 
@@ -214,7 +214,7 @@ var identifyAddress = function (addr) {
     if (Data_Boolean.otherwise) {
         return Data_Maybe.Nothing.value;
     };
-    throw new Error("Failed pattern match at Main (line 53, column 1 - line 53, column 74): " + [ addr.constructor.name ]);
+    throw new Error("Failed pattern match at Main (line 57, column 1 - line 57, column 74): " + [ addr.constructor.name ]);
 };
 
 // Given this NuttX Exception: `riscv_exception: EXCEPTION: Load page fault. MCAUSE: 000000000000000d, EPC: 000000008000a0e4, MTVAL: 0000000880203b88`
@@ -252,7 +252,7 @@ var doRunParser = function (dictShow) {
                         if (v instanceof Data_Either.Right) {
                             return Effect_Console.log("Result: " + show1(v.value0))();
                         };
-                        throw new Error("Failed pattern match at Main (line 250, column 3 - line 252, column 52): " + [ v.constructor.name ]);
+                        throw new Error("Failed pattern match at Main (line 254, column 3 - line 256, column 52): " + [ v.constructor.name ]);
                     })();
                     return Effect_Console.log("-----")();
                 };
