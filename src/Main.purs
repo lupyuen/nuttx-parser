@@ -185,15 +185,15 @@ parseException = do
       exception
     , mcause:
         -1 `fromMaybe` -- If `mcauseStr` is not a valid hex, return -1
-        fromStringAs hexadecimal mcauseStr -- Else return the hex value of `mcauseStr`
+          fromStringAs hexadecimal mcauseStr -- Else return the hex value of `mcauseStr`
 
     , epc:
         epcWithPrefix `fromMaybe` -- If `epcWithPrefix` does not have prefix `00000000`, return it
-        stripPrefix (Pattern "00000000") epcWithPrefix -- Else strip prefix `00000000` from `epc`
+          stripPrefix (Pattern "00000000") epcWithPrefix -- Else strip prefix `00000000` from `epc`
 
     , mtval:
         mtvalWithPrefix `fromMaybe` -- If `mtvalWithPrefix` does not have prefix `00000000`, return it
-        stripPrefix (Pattern "00000000") mtvalWithPrefix -- Else strip prefix `00000000` from `mtval`
+          stripPrefix (Pattern "00000000") mtvalWithPrefix -- Else strip prefix `00000000` from `mtval`
     }
 
 -- Parse a line of NuttX Stack Dump.
